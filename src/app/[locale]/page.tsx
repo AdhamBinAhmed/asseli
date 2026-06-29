@@ -259,18 +259,18 @@ export default function Home() {
       {/* Dynamic Background */}
       <div ref={bgRef} className="absolute inset-0 -z-20 transition-all pointer-events-none" />
 
-      <div className="flex flex-col md:flex-row justify-between items-stretch w-full h-full max-w-screen-2xl px-8 z-10 relative pointer-events-none">
+      <div className="flex flex-col md:flex-row justify-between items-center md:items-stretch w-full h-full max-w-screen-2xl px-4 md:px-8 z-10 relative pointer-events-none">
 
         {/* Left Column */}
-        <div className="flex flex-col justify-center h-full md:w-1/3 gap-6 pointer-events-auto z-50">
-          <h1 className="text-6xl md:text-8xl font-bold tracking-tight leading-none drop-shadow-xl" style={{ fontFamily: 'var(--font-geist-sans)' }}>
+        <div className="flex flex-col justify-start md:justify-center h-auto md:h-full w-full md:w-1/3 gap-4 md:gap-6 pointer-events-auto z-50 pt-8 md:pt-0">
+          <h1 className="text-5xl md:text-6xl lg:text-8xl font-bold tracking-tight leading-none drop-shadow-xl" style={{ fontFamily: 'var(--font-geist-sans)' }}>
             <span className="text-white/90 drop-shadow-lg text-stroke">Pure</span><br />
             Nature
           </h1>
-          <p className="text-lg text-white/90 max-w-sm drop-shadow-md">
+          <p className="text-base md:text-lg text-white/90 max-w-sm drop-shadow-md">
             {t('description')}
           </p>
-          <div className="mt-4">
+          <div className="mt-2 md:mt-4">
             <Link href="/products">
               <button className="flex items-center gap-4 bg-black/50 hover:bg-black/80 text-white rounded-full px-2 py-2 pr-6 font-bold transition-all shadow-xl backdrop-blur-md">
                 <span className="bg-amber-400 text-black w-10 h-10 rounded-full flex items-center justify-center"><Plus /></span>
@@ -279,7 +279,7 @@ export default function Home() {
             </Link>
           </div>
 
-          <div className="flex items-center gap-4 mt-auto pb-8">
+          <div className="hidden md:flex items-center gap-4 mt-auto pb-8">
             <div className="w-12 h-12 rounded-xl bg-black/20 backdrop-blur-md border border-white/20 flex items-center justify-center shadow-lg">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" className="text-amber-400"><path d="M12 15L15 18L19 14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /><path d="M7 10L12 15L17 10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
             </div>
@@ -291,22 +291,22 @@ export default function Home() {
         </div>
 
         {/* Right Column (Carousel) */}
-        <div className="flex flex-col justify-center md:items-end text-right h-full md:w-1/3 z-50 pointer-events-auto">
-          <div className="flex flex-col gap-6 items-end pb-8">
+        <div className="flex flex-col justify-end md:justify-center items-center md:items-end text-center md:text-right h-auto md:h-full w-full md:w-1/3 z-50 pointer-events-auto pb-8 md:pb-0 mt-auto md:mt-0">
+          <div className="flex flex-col gap-4 md:gap-6 items-center md:items-end pb-4 md:pb-8">
             <div className="flex gap-4">
-              <div onClick={() => switchTheme('classic')} className={`cursor-pointer bg-black/20 backdrop-blur-md border ${flavor === 'classic' ? 'border-amber-400 border-2' : 'border-white/20 hover:bg-black/40'} p-4 pt-16 rounded-3xl flex flex-col items-center w-32 transition-all relative shadow-xl`}>
-                <img src="/honey-light.png" alt="Classic Honey" width="90" height="90" className="absolute -top-10 drop-shadow-2xl pointer-events-none object-contain" />
-                <span className="font-bold text-sm mt-2">Classic Amber</span>
-                <span className="text-xs text-white/70">Raw Honey</span>
+              <div onClick={() => switchTheme('classic')} className={`cursor-pointer bg-black/20 backdrop-blur-md border ${flavor === 'classic' ? 'border-amber-400 border-2' : 'border-white/20 hover:bg-black/40'} p-3 md:p-4 pt-12 md:pt-16 rounded-3xl flex flex-col items-center w-28 md:w-32 transition-all relative shadow-xl`}>
+                <img src="/honey-light.png" alt="Classic Honey" width="80" height="80" className="absolute -top-10 md:-top-10 drop-shadow-2xl pointer-events-none object-contain" />
+                <span className="font-bold text-xs md:text-sm mt-2">Classic Amber</span>
+                <span className="text-[10px] md:text-xs text-white/70">Raw Honey</span>
               </div>
-              <div onClick={() => switchTheme('dark')} className={`cursor-pointer bg-black/20 backdrop-blur-md border ${flavor === 'dark' ? 'border-amber-400 border-2' : 'border-white/20 hover:bg-black/40'} p-4 pt-16 rounded-3xl flex flex-col items-center w-32 transition-all relative shadow-xl`}>
-                <img src="/honey-dark.png" alt="Dark Forest Honey" width="115" height="115" className="absolute -top-12 drop-shadow-2xl pointer-events-none object-contain" />
-                <span className="font-bold text-sm mt-2">Dark Forest</span>
-                <span className="text-xs text-white/70">Premium Blend</span>
+              <div onClick={() => switchTheme('dark')} className={`cursor-pointer bg-black/20 backdrop-blur-md border ${flavor === 'dark' ? 'border-amber-400 border-2' : 'border-white/20 hover:bg-black/40'} p-3 md:p-4 pt-12 md:pt-16 rounded-3xl flex flex-col items-center w-28 md:w-32 transition-all relative shadow-xl`}>
+                <img src="/honey-dark.png" alt="Dark Forest Honey" width="95" height="95" className="absolute -top-12 md:-top-12 drop-shadow-2xl pointer-events-none object-contain" />
+                <span className="font-bold text-xs md:text-sm mt-2">Dark Forest</span>
+                <span className="text-[10px] md:text-xs text-white/70">Premium Blend</span>
               </div>
             </div>
 
-            <h2 className="text-5xl md:text-6xl font-bold tracking-tight mt-8 drop-shadow-xl" style={{ fontFamily: 'var(--font-geist-sans)' }}>
+            <h2 className="hidden md:block text-5xl md:text-6xl font-bold tracking-tight mt-8 drop-shadow-xl" style={{ fontFamily: 'var(--font-geist-sans)' }}>
               <span className="text-white/90">Refreshingly</span><br />
               Sweet
             </h2>
@@ -321,7 +321,7 @@ export default function Home() {
           ref={mainProductRef}
           src={flavor === 'classic' ? '/honey-light.png' : '/honey-dark.png'}
           alt="Main Honey Jar"
-          className="w-[250px] md:w-[350px] lg:w-[450px] object-contain drop-shadow-[0_20px_50px_rgba(0,0,0,0.8)] absolute top-1/2 left-1/2"
+          className="w-[180px] md:w-[350px] lg:w-[450px] object-contain drop-shadow-[0_20px_50px_rgba(0,0,0,0.8)] absolute top-[48%] md:top-1/2 left-1/2"
           style={{ transformStyle: 'preserve-3d' }}
         />
       </div>
