@@ -295,12 +295,12 @@ export default function Home() {
           <div className="flex flex-col gap-4 md:gap-6 items-center md:items-end pb-2 md:pb-8">
             <div className="flex gap-3 md:gap-4">
               <div onClick={() => switchTheme('classic')} className={`cursor-pointer bg-black/20 backdrop-blur-md border ${flavor === 'classic' ? 'border-amber-400 border-2' : 'border-white/20 hover:bg-black/40'} p-2 md:p-4 pt-10 md:pt-16 rounded-2xl md:rounded-3xl flex flex-col items-center w-24 sm:w-28 md:w-32 transition-all relative shadow-xl`}>
-                <img src="/honey-light.png" alt={t('classicAmber')} width="65" height="65" className="absolute -top-8 sm:-top-10 md:-top-10 drop-shadow-2xl pointer-events-none object-contain" />
+                <img src="/honey-light.png" alt={t('classicAmber')} width="78" height="78" className="absolute -top-8 sm:-top-10 md:-top-10 drop-shadow-2xl pointer-events-none object-contain" />
                 <span className="font-bold text-[11px] sm:text-xs md:text-sm mt-1 md:mt-2 text-center leading-tight">{t('classicAmber')}</span>
                 <span className="text-[9px] sm:text-[10px] md:text-xs text-white/70 text-center">{t('rawHoney')}</span>
               </div>
               <div onClick={() => switchTheme('dark')} className={`cursor-pointer bg-black/20 backdrop-blur-md border ${flavor === 'dark' ? 'border-amber-400 border-2' : 'border-white/20 hover:bg-black/40'} p-2 md:p-4 pt-10 md:pt-16 rounded-2xl md:rounded-3xl flex flex-col items-center w-24 sm:w-28 md:w-32 transition-all relative shadow-xl`}>
-                <img src="/honey-dark.png" alt={t('darkForest')} width="75" height="75" className="absolute -top-10 sm:-top-12 md:-top-12 drop-shadow-2xl pointer-events-none object-contain" />
+                <img src="/honey-dark.png" alt={t('darkForest')} width="90" height="90" className="absolute -top-10 sm:-top-12 md:-top-12 drop-shadow-2xl pointer-events-none object-contain" />
                 <span className="font-bold text-[11px] sm:text-xs md:text-sm mt-1 md:mt-2 text-center leading-tight">{t('darkForest')}</span>
                 <span className="text-[9px] sm:text-[10px] md:text-xs text-white/70 text-center">{t('premiumBlend')}</span>
               </div>
@@ -321,7 +321,7 @@ export default function Home() {
           ref={mainProductRef}
           src={flavor === 'classic' ? '/honey-light.png' : '/honey-dark.png'}
           alt="Main Honey Jar"
-          className="w-[130px] sm:w-[180px] md:w-[350px] lg:w-[450px] object-contain drop-shadow-[0_20px_50px_rgba(0,0,0,0.8)] absolute top-[48%] md:top-1/2 left-1/2"
+          className="w-[156px] sm:w-[216px] md:w-[420px] lg:w-[540px] object-contain drop-shadow-[0_20px_50px_rgba(0,0,0,0.8)] absolute top-[48%] md:top-1/2 left-1/2"
           style={{ transformStyle: 'preserve-3d' }}
         />
       </div>
