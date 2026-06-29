@@ -291,17 +291,17 @@ export default function Home() {
         </div>
 
         {/* Right Column (Carousel) */}
-        <div className="flex flex-col justify-end md:justify-center items-center md:items-end text-center md:text-right h-auto md:h-full w-full md:w-1/3 z-50 pointer-events-auto pb-6 md:pb-0 mt-auto md:mt-0">
+        <div className="flex flex-col justify-end md:justify-center items-center md:items-end text-center md:text-right h-auto md:h-full w-full md:w-1/3 z-50 pointer-events-auto pb-20 md:pb-0 mt-auto md:mt-0">
           <div className="flex flex-col gap-4 md:gap-6 items-center md:items-end pb-2 md:pb-8">
-            <div className="flex gap-3 md:gap-4">
-              <div onClick={() => switchTheme('classic')} className={`cursor-pointer bg-black/20 backdrop-blur-md border ${flavor === 'classic' ? 'border-amber-400 border-2' : 'border-white/20 hover:bg-black/40'} p-2 md:p-4 pt-10 md:pt-16 rounded-2xl md:rounded-3xl flex flex-col items-center w-24 sm:w-28 md:w-32 transition-all relative shadow-xl`}>
-                <img src="/honey-light.png" alt={t('classicAmber')} width="70" height="70" className="absolute -top-8 sm:-top-10 md:-top-10 drop-shadow-2xl pointer-events-none object-contain" />
-                <span className="font-bold text-[11px] sm:text-xs md:text-sm mt-1 md:mt-2 text-center leading-tight">{t('classicAmber')}</span>
+            <div className="flex gap-4 md:gap-4">
+              <div onClick={() => switchTheme('classic')} className={`cursor-pointer bg-black/20 backdrop-blur-md border ${flavor === 'classic' ? 'border-amber-400 border-2' : 'border-white/20 hover:bg-black/40'} p-2 md:p-4 pt-16 md:pt-16 rounded-2xl md:rounded-3xl flex flex-col items-center w-24 sm:w-28 md:w-32 transition-all relative shadow-xl`}>
+                <img src="/honey-light.png" alt={t('classicAmber')} className="absolute -top-16 md:-top-10 drop-shadow-2xl pointer-events-none object-contain w-[120px] md:w-[70px] h-[120px] md:h-[70px]" />
+                <span className="font-bold text-[11px] sm:text-xs md:text-sm mt-2 md:mt-2 text-center leading-tight">{t('classicAmber')}</span>
                 <span className="text-[9px] sm:text-[10px] md:text-xs text-white/70 text-center">{t('rawHoney')}</span>
               </div>
-              <div onClick={() => switchTheme('dark')} className={`cursor-pointer bg-black/20 backdrop-blur-md border ${flavor === 'dark' ? 'border-amber-400 border-2' : 'border-white/20 hover:bg-black/40'} p-2 md:p-4 pt-10 md:pt-16 rounded-2xl md:rounded-3xl flex flex-col items-center w-24 sm:w-28 md:w-32 transition-all relative shadow-xl`}>
-                <img src="/honey-dark.png" alt={t('darkForest')} width="220" height="220" className="absolute -top-10 sm:-top-12 md:-top-12 drop-shadow-2xl pointer-events-none object-contain" />
-                <span className="font-bold text-[11px] sm:text-xs md:text-sm mt-1 md:mt-2 text-center leading-tight">{t('darkForest')}</span>
+              <div onClick={() => switchTheme('dark')} className={`cursor-pointer bg-black/20 backdrop-blur-md border ${flavor === 'dark' ? 'border-amber-400 border-2' : 'border-white/20 hover:bg-black/40'} p-2 md:p-4 pt-16 md:pt-16 rounded-2xl md:rounded-3xl flex flex-col items-center w-24 sm:w-28 md:w-32 transition-all relative shadow-xl`}>
+                <img src="/honey-dark.png" alt={t('darkForest')} className="absolute -top-20 md:-top-12 drop-shadow-2xl pointer-events-none object-contain w-[140px] md:w-[95px] h-[140px] md:h-[95px]" />
+                <span className="font-bold text-[11px] sm:text-xs md:text-sm mt-3 md:mt-2 text-center leading-tight">{t('darkForest')}</span>
                 <span className="text-[9px] sm:text-[10px] md:text-xs text-white/70 text-center">{t('premiumBlend')}</span>
               </div>
             </div>
