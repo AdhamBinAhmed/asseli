@@ -34,8 +34,8 @@
   },
   "TrackOrder": {
     "title": "تتبع طلبك",
-    "description": "أدخل رقم الطلب لمعرفة حالته الحالية.",
-    "orderIdPlaceholder": "مثال: jX9s8df723",
+    "description": "أدخل رقم الطلب أو رقم الهاتف لمعرفة حالته الحالية.",
+    "orderIdPlaceholder": "مثال: jX9s8df723 أو 01xxxx",
     "trackButton": "تتبع الطلب",
     "status": "حالة الطلب",
     "pending": "قيد الانتظار",

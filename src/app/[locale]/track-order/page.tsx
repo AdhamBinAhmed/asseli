@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, collection, query, where, getDocs } from 'firebase/firestore';
 import { db } from '@/lib/firebase/config';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -30,6 +30,15 @@ export default function TrackOrderPage() {
       
       if (docSnap.exists()) {
         setOrder({ id: docSnap.id, ...docSnap.data() });
+      } else {
+        const q = query(collection(db, 'orders'), where('customerPhone', '==', orderId.trim()));
+        const querySnapshot = await getDocs(q);
+        
+        if (!querySnapshot.empty) {
+          // We take the first (most recent) matching order if multiple exist
+          const firstDoc = querySnapshot.docs[querySnapshot.docs.length - 1];
+          setOrder({ id: firstDoc.id, ...firstDoc.data() });
+        }
       }
     } catch (e) {
       console.error(e);

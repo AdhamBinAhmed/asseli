@@ -34,8 +34,8 @@
   },
   "TrackOrder": {
     "title": "Track Your Order",
-    "description": "Enter your Order ID to see its current status.",
-    "orderIdPlaceholder": "e.g. jX9s8df723",
+    "description": "Enter your Order ID or Phone Number to see its current status.",
+    "orderIdPlaceholder": "e.g. jX9s8df723 or 01xxxx",
     "trackButton": "Track Order",
     "status": "Order Status",
     "pending": "Pending",
