@@ -300,7 +300,7 @@ export default function Home() {
                 <span className="text-[9px] sm:text-[10px] md:text-xs text-white/70 text-center">{t('rawHoney')}</span>
               </div>
               <div onClick={() => switchTheme('dark')} className={`cursor-pointer bg-black/20 backdrop-blur-md border ${flavor === 'dark' ? 'border-amber-400 border-2' : 'border-white/20 hover:bg-black/40'} p-2 md:p-4 pt-10 md:pt-16 rounded-2xl md:rounded-3xl flex flex-col items-center w-24 sm:w-28 md:w-32 transition-all relative shadow-xl`}>
-                <img src="/honey-dark.png" alt={t('darkForest')} width="90" height="90" className="absolute -top-10 sm:-top-12 md:-top-12 drop-shadow-2xl pointer-events-none object-contain" />
+                <img src="/honey-dark.png" alt={t('darkForest')} width="95" height="95" className="absolute -top-10 sm:-top-12 md:-top-12 drop-shadow-2xl pointer-events-none object-contain" />
                 <span className="font-bold text-[11px] sm:text-xs md:text-sm mt-1 md:mt-2 text-center leading-tight">{t('darkForest')}</span>
                 <span className="text-[9px] sm:text-[10px] md:text-xs text-white/70 text-center">{t('premiumBlend')}</span>
               </div>
