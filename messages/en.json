@@ -13,6 +13,7 @@
   "Navbar": {
     "home": "Home",
     "shop": "Shop",
+    "track": "Track Order",
     "provenance": "Provenance",
     "cartTitle": "Your Cart",
     "cartDesc": "Review your premium honey selections.",
@@ -30,5 +31,20 @@
     "selectGovernorate": "Select Governorate",
     "checkout": "Proceed to Checkout",
     "remove": "Remove"
+  },
+  "TrackOrder": {
+    "title": "Track Your Order",
+    "description": "Enter your Order ID to see its current status.",
+    "orderIdPlaceholder": "e.g. jX9s8df723",
+    "trackButton": "Track Order",
+    "status": "Order Status",
+    "pending": "Pending",
+    "accepted": "Accepted",
+    "refused": "Refused",
+    "notFound": "Order not found. Please check your ID.",
+    "orderDetails": "Order Details",
+    "items": "Items",
+    "total": "Total",
+    "shipping": "Shipping to"
   }
 }

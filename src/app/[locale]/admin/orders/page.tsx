@@ -1,7 +1,18 @@
 'use client';
+
 import { useEffect, useState } from 'react';
-import { collection, getDocs } from 'firebase/firestore';
+import { collection, getDocs, updateDoc, doc, deleteDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase/config';
+import { Button } from '@/components/ui/button';
+import { Trash2, CheckCircle, XCircle, Clock } from 'lucide-react';
+import { Link } from '@/i18n/routing';
+
+interface OrderItem {
+  id: string;
+  name: string;
+  price: string;
+  quantity: number;
+}
 
 interface Order {
   id: string;
@@ -9,8 +20,9 @@ interface Order {
   customerPhone: string;
   customerAddress: string;
   governorate: string;
-  items: any[];
+  items: OrderItem[];
   total: number;
+  status: 'pending' | 'accepted' | 'refused';
   date: string;
 }
 
@@ -22,9 +34,10 @@ export default function AdminOrders() {
     try {
       const querySnapshot = await getDocs(collection(db, 'orders'));
       const data: Order[] = [];
-      querySnapshot.forEach((doc) => {
-        data.push({ id: doc.id, ...doc.data() } as Order);
+      querySnapshot.forEach((docSnap) => {
+        data.push({ id: docSnap.id, ...docSnap.data() } as Order);
       });
+      // Sort newest first
       data.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
       setOrders(data);
     } catch (e) {
@@ -38,38 +51,107 @@ export default function AdminOrders() {
     fetchOrders();
   }, []);
 
+  const updateStatus = async (id: string, newStatus: 'pending' | 'accepted' | 'refused') => {
+    try {
+      await updateDoc(doc(db, 'orders', id), { status: newStatus });
+      fetchOrders();
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!confirm('Are you sure you want to delete this order entirely?')) return;
+    try {
+      await deleteDoc(doc(db, 'orders', id));
+      fetchOrders();
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const StatusIcon = ({ status }: { status: string }) => {
+    if (status === 'accepted') return <CheckCircle className="w-5 h-5 text-emerald-500" />;
+    if (status === 'refused') return <XCircle className="w-5 h-5 text-destructive" />;
+    return <Clock className="w-5 h-5 text-amber-500" />;
+  };
+
   return (
-    <div className="p-8">
-      <h1 className="text-3xl font-bold mb-8">Incoming Orders</h1>
-      
+    <div className="p-8 max-w-7xl mx-auto w-full">
+      <div className="flex items-center justify-between mb-8">
+        <h1 className="text-3xl font-bold">Manage Orders</h1>
+        <div className="flex gap-4">
+          <Link href="/admin/products">
+            <Button variant="outline">Manage Products</Button>
+          </Link>
+          <Link href="/admin/orders">
+            <Button>Manage Orders</Button>
+          </Link>
+        </div>
+      </div>
+
       {isLoading ? (
         <p className="text-muted-foreground">Loading orders...</p>
       ) : (
         <div className="flex flex-col gap-6">
+          {orders.length === 0 && <p className="text-muted-foreground">No orders found.</p>}
+          
           {orders.map(order => (
-            <div key={order.id} className="p-6 border border-border/50 rounded-xl bg-card flex flex-col md:flex-row gap-8 justify-between shadow-sm">
-              <div className="flex flex-col gap-2">
-                <h3 className="font-bold text-lg text-primary">{order.customerName}</h3>
-                <p className="text-muted-foreground font-medium">{order.customerPhone}</p>
-                <p className="text-muted-foreground max-w-sm">{order.customerAddress}, {order.governorate}</p>
-                <p className="text-xs text-muted-foreground mt-2">Ordered: {new Date(order.date).toLocaleString()}</p>
-              </div>
-              <div className="flex flex-col gap-2 md:min-w-[300px] bg-muted/30 p-4 rounded-lg">
-                <h4 className="font-semibold border-b border-border/50 pb-2 mb-2">Order Items</h4>
-                {order.items.map((item, i) => (
-                  <div key={i} className="flex justify-between text-sm">
-                    <span>{item.quantity}x {item.name}</span>
-                    <span>{item.price}</span>
+            <div key={order.id} className="p-6 border border-border/50 rounded-2xl bg-card flex flex-col md:flex-row gap-6">
+              
+              <div className="flex-1">
+                <div className="flex items-center gap-3 mb-2">
+                  <StatusIcon status={order.status || 'pending'} />
+                  <span className="font-semibold text-lg uppercase tracking-wider">{order.status || 'pending'}</span>
+                  <span className="text-xs text-muted-foreground ml-auto bg-muted px-2 py-1 rounded-md">ID: {order.id}</span>
+                </div>
+                
+                <h3 className="text-xl font-bold mb-1">{order.customerName}</h3>
+                <p className="text-sm text-muted-foreground mb-4">
+                  {order.customerPhone} • {order.customerAddress}, {order.governorate}
+                  <br/>
+                  <span className="text-xs">{new Date(order.date).toLocaleString()}</span>
+                </p>
+
+                <div className="bg-muted/30 rounded-xl p-4 border border-border/20">
+                  <h4 className="font-medium text-sm mb-2 text-muted-foreground">Items Ordered:</h4>
+                  <ul className="space-y-1">
+                    {order.items?.map((item, i) => (
+                      <li key={i} className="text-sm flex justify-between">
+                        <span>{item.quantity}x {item.name}</span>
+                        <span>{item.price}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  <div className="border-t border-border/50 mt-3 pt-3 flex justify-between font-bold">
+                    <span>Total</span>
+                    <span>${(order.total || 0).toFixed(2)}</span>
                   </div>
-                ))}
-                <div className="flex justify-between font-bold mt-2 pt-2 border-t border-border/50 text-primary">
-                  <span>Total</span>
-                  <span>${order.total.toFixed(2)}</span>
                 </div>
               </div>
+
+              <div className="flex flex-row md:flex-col gap-2 justify-end items-end md:items-stretch min-w-[140px]">
+                <Button 
+                  variant={order.status === 'accepted' ? 'default' : 'outline'} 
+                  className={order.status === 'accepted' ? 'bg-emerald-600 hover:bg-emerald-700 text-white' : ''}
+                  onClick={() => updateStatus(order.id, 'accepted')}
+                >
+                  Accept
+                </Button>
+                <Button 
+                  variant={order.status === 'refused' ? 'destructive' : 'outline'}
+                  onClick={() => updateStatus(order.id, 'refused')}
+                >
+                  Refuse
+                </Button>
+                <div className="flex-1 hidden md:block"></div>
+                <Button variant="ghost" className="text-destructive hover:bg-destructive/10 mt-auto" onClick={() => handleDelete(order.id)}>
+                  <Trash2 className="w-4 h-4 mr-2" /> Delete
+                </Button>
+              </div>
+
             </div>
           ))}
-          {orders.length === 0 && <p className="text-muted-foreground">No orders yet.</p>}
         </div>
       )}
     </div>

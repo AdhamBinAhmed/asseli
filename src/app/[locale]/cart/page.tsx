@@ -80,13 +80,14 @@ export default function CartPage() {
         governorate: selectedGovData?.en || selectedGov,
         items: items.map(i => ({ name: i.name, quantity: i.quantity, price: i.price, id: i.id })),
         total: total,
+        status: 'pending',
         date: new Date().toISOString()
       };
       
-      await addDoc(collection(db, 'orders'), order);
+      const docRef = await addDoc(collection(db, 'orders'), order);
       clearCart();
-      alert(locale === 'ar' ? 'تم استلام طلبك بنجاح!' : 'Your order has been received successfully!');
-      router.push('/products');
+      alert(locale === 'ar' ? `تم استلام طلبك بنجاح! رقم تتبع الطلب الخاص بك هو: ${docRef.id}` : `Your order has been received successfully! Your tracking ID is: ${docRef.id}`);
+      router.push('/track-order');
     } catch (e) {
       console.error(e);
       alert('Error placing order.');

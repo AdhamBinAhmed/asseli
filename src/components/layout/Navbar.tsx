@@ -53,6 +53,7 @@ export function Navbar() {
           <Link href="/" className="transition-colors hover:text-foreground">{t('home')}</Link>
           <Link href="/products" className="transition-colors hover:text-foreground">{t('shop')}</Link>
           <Link href="/lab-analysis" className="transition-colors hover:text-foreground">{t('provenance')}</Link>
+          <Link href="/track-order" className="transition-colors hover:text-foreground">{t('track')}</Link>
         </nav>
 
         {/* Right Section (Lang & Cart) */}
