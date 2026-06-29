@@ -1,0 +1,34 @@
+{
+  "HomePage": {
+    "title": "عسلي",
+    "description": "اكتشف تشكيلتنا الفاخرة من العسل النقي  من القاهرة، مصر.",
+    "cta": "تسوق الآن"
+  },
+  "ProductsPage": {
+    "title": "مجموعتنا",
+    "description": "استكشف تشكيلتنا المختارة بعناية من العسل  الفاخر والموثق بشكل مستقل.",
+    "addToCart": "أضف إلى السلة",
+    "viewDetails": "عرض التفاصيل"
+  },
+  "Navbar": {
+    "home": "الرئيسية",
+    "shop": "المتجر",
+    "provenance": "المصدر",
+    "cartTitle": "سلة التسوق",
+    "cartDesc": "راجع اختياراتك من العسل الفاخر.",
+    "total": "الإجمالي",
+    "checkout": "الدفع"
+  },
+  "CartPage": {
+    "title": "سلة التسوق",
+    "empty": "سلة التسوق الخاصة بك فارغة حاليا.",
+    "continueShopping": "متابعة التسوق",
+    "orderSummary": "ملخص الطلب",
+    "subtotal": "المجموع الفرعي",
+    "shipping": "الشحن",
+    "shippingOptions": "اختر المحافظة للشحن",
+    "selectGovernorate": "اختر المحافظة",
+    "checkout": "متابعة الدفع",
+    "remove": "إزالة"
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "HomePage": {
+    "title": "Artisan Honey",
+    "description": "Discover our premium selection of pure, artisan honey from Cairo, Egypt.",
+    "cta": "Shop Now"
+  },
+  "ProductsPage": {
+    "title": "Our Collection",
+    "description": "Explore our curated selection of premium, independently verified artisan honeys.",
+    "addToCart": "Add to Cart",
+    "viewDetails": "View Details"
+  },
+  "Navbar": {
+    "home": "Home",
+    "shop": "Shop",
+    "provenance": "Provenance",
+    "cartTitle": "Your Cart",
+    "cartDesc": "Review your premium honey selections.",
+    "total": "Total",
+    "checkout": "Checkout"
+  },
+  "CartPage": {
+    "title": "Your Cart",
+    "empty": "Your cart is currently empty.",
+    "continueShopping": "Continue Shopping",
+    "orderSummary": "Order Summary",
+    "subtotal": "Subtotal",
+    "shipping": "Shipping",
+    "shippingOptions": "Select Governorate for Shipping",
+    "selectGovernorate": "Select Governorate",
+    "checkout": "Proceed to Checkout",
+    "remove": "Remove"
+  }
+}
