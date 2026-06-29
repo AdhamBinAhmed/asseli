@@ -295,12 +295,12 @@ export default function Home() {
           <div className="flex flex-col gap-6 items-end pb-8">
             <div className="flex gap-4">
               <div onClick={() => switchTheme('classic')} className={`cursor-pointer bg-black/20 backdrop-blur-md border ${flavor === 'classic' ? 'border-amber-400 border-2' : 'border-white/20 hover:bg-black/40'} p-4 pt-16 rounded-3xl flex flex-col items-center w-32 transition-all relative shadow-xl`}>
-                <Image src="/honey-light.png" alt="Classic Honey" width={90} height={90} className="absolute -top-10 drop-shadow-2xl pointer-events-none" />
+                <img src="/honey-light.png" alt="Classic Honey" width="90" height="90" className="absolute -top-10 drop-shadow-2xl pointer-events-none object-contain" />
                 <span className="font-bold text-sm mt-2">Classic Amber</span>
                 <span className="text-xs text-white/70">Raw Honey</span>
               </div>
               <div onClick={() => switchTheme('dark')} className={`cursor-pointer bg-black/20 backdrop-blur-md border ${flavor === 'dark' ? 'border-amber-400 border-2' : 'border-white/20 hover:bg-black/40'} p-4 pt-16 rounded-3xl flex flex-col items-center w-32 transition-all relative shadow-xl`}>
-                <Image src="/honey-dark.png" alt="Dark Forest Honey" width={90} height={90} className="absolute -top-10 drop-shadow-2xl pointer-events-none" />
+                <img src="/honey-dark.png" alt="Dark Forest Honey" width="90" height="90" className="absolute -top-10 drop-shadow-2xl pointer-events-none object-contain" />
                 <span className="font-bold text-sm mt-2">Dark Forest</span>
                 <span className="text-xs text-white/70">Premium Blend</span>
               </div>
