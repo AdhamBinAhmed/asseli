@@ -264,8 +264,8 @@ export default function Home() {
         {/* Left Column */}
         <div className="flex flex-col justify-start md:justify-center h-auto md:h-full w-full md:w-1/3 gap-3 md:gap-6 pointer-events-auto z-50 pt-8 md:pt-0">
           <h1 className="text-5xl md:text-6xl lg:text-8xl font-bold tracking-tight leading-[1.1] rtl:leading-[1.4] drop-shadow-xl" style={{ fontFamily: 'var(--font-geist-sans)' }}>
-            <span className="text-white/90 drop-shadow-lg text-stroke">{t('pure')}</span><br />
-            {t('nature')}
+            <span className="text-white/90 drop-shadow-lg text-stroke">{t('headingLine1')}</span><br />
+            {t('headingLine2')}
           </h1>
           <p className="hidden sm:block text-base md:text-lg text-white/90 max-w-sm drop-shadow-md">
             {t('description')}
@@ -307,8 +307,8 @@ export default function Home() {
             </div>
 
             <h2 className="hidden md:block text-5xl md:text-6xl font-bold tracking-tight mt-8 drop-shadow-xl leading-[1.1] rtl:leading-[1.4]" style={{ fontFamily: 'var(--font-geist-sans)' }}>
-              <span className="text-white/90">{t('refreshingly')}</span><br />
-              {t('sweet')}
+              <span className="text-white/90">{t('subheadingLine1')}</span><br />
+              {t('subheadingLine2')}
             </h2>
           </div>
         </div>
