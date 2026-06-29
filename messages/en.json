@@ -1,8 +1,18 @@
 {
   "HomePage": {
     "title": "Artisan Honey",
+    "pure": "Pure",
+    "nature": "Nature",
     "description": "Discover our premium selection of pure, artisan honey from Cairo, Egypt.",
-    "cta": "Shop Now"
+    "cta": "Shop Now",
+    "qualityAssured": "Quality Assured",
+    "pureHoney": "100% Pure Honey",
+    "classicAmber": "Classic Amber",
+    "rawHoney": "Raw Honey",
+    "darkForest": "Dark Forest",
+    "premiumBlend": "Premium Blend",
+    "refreshingly": "Refreshingly",
+    "sweet": "Sweet"
   },
   "ProductsPage": {
     "title": "Our Collection",

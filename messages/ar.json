@@ -1,8 +1,18 @@
 {
   "HomePage": {
     "title": "أصيلي",
+    "pure": "طبيعة",
+    "nature": "نقية",
     "description": "اكتشف تشكيلتنا الفاخرة من العسل النقي صث  من القاهرة، مصر.",
-    "cta": "تسوق الآن"
+    "cta": "تسوق الآن",
+    "qualityAssured": "مضمون الجودة",
+    "pureHoney": "عسل طبيعي ١٠٠٪",
+    "classicAmber": "عنبر كلاسيكي",
+    "rawHoney": "عسل خام",
+    "darkForest": "غابة داكنة",
+    "premiumBlend": "مزيج فاخر",
+    "refreshingly": "حلاوة",
+    "sweet": "منعشة"
   },
   "ProductsPage": {
     "title": "مجموعتنا",
