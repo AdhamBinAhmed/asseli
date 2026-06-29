@@ -56,5 +56,12 @@
     "items": "Items",
     "total": "Total",
     "shipping": "Shipping to"
+  },
+  "Footer": {
+    "rights": "All rights reserved to Asseli & Mega Devs",
+    "poweredBy": "Powered by",
+    "megaDevs": "Mega Devs",
+    "contact": "Contact Us",
+    "whatsapp": "WhatsApp"
   }
 }

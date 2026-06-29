@@ -6,6 +6,7 @@ import { getMessages } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import { routing } from '@/i18n/routing';
 import { Navbar } from '@/components/layout/Navbar';
+import { Footer } from '@/components/layout/Footer';
 import { GlobalSettingsProvider } from '@/components/layout/GlobalSettingsProvider';
 
 const geistSans = Geist({
@@ -48,6 +49,7 @@ export default async function RootLayout({
             <main className="flex-1 flex flex-col relative">
               {children}
             </main>
+            <Footer />
           </GlobalSettingsProvider>
         </NextIntlClientProvider>
       </body>
