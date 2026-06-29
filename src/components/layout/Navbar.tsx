@@ -2,7 +2,7 @@
 
 import { usePathname, useRouter, Link } from '@/i18n/routing';
 import { useLocale, useTranslations } from 'next-intl';
-import { ShoppingCart, Globe, Menu } from 'lucide-react';
+import { ShoppingCart, Globe, Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useCartStore } from '@/store/useCartStore';
 import { useEffect, useState } from 'react';
@@ -22,7 +22,13 @@ export function Navbar() {
   
   // Prevent hydration mismatch for zustand store
   const [mounted, setMounted] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
   useEffect(() => setMounted(true), []);
+
+  useEffect(() => {
+    setIsMobileMenuOpen(false);
+  }, [pathname]);
 
   const cartItemCount = items.reduce((acc, item) => acc + item.quantity, 0);
   
@@ -34,9 +40,9 @@ export function Navbar() {
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/40 backdrop-blur-md">
       <div className="container mx-auto flex h-16 items-center justify-between px-4 md:px-8">
         
-        {/* Mobile Menu */}
+        {/* Mobile Menu Toggle */}
         <div className="flex items-center md:hidden">
-          <Button variant="ghost" size="icon">
+          <Button variant="ghost" size="icon" onClick={() => setIsMobileMenuOpen(true)}>
             <Menu className="h-5 w-5" />
           </Button>
         </div>
@@ -83,6 +89,28 @@ export function Navbar() {
               )}
             </Button>
           </Link>
+        </div>
+      </div>
+
+      {/* Mobile Menu Overlay & Drawer */}
+      <div 
+        className={`fixed inset-0 z-50 bg-black/60 backdrop-blur-sm transition-opacity duration-300 md:hidden ${isMobileMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
+        onClick={() => setIsMobileMenuOpen(false)}
+      />
+      <div 
+        className={`fixed top-0 bottom-0 right-0 z-50 w-[70%] bg-background border-l border-border/40 shadow-2xl transition-transform duration-300 ease-in-out md:hidden flex flex-col ${isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}
+      >
+        <div className="flex items-center justify-between p-4 border-b border-border/40">
+          <span className="text-xl font-bold tracking-widest text-primary uppercase">Asseli</span>
+          <Button variant="ghost" size="icon" onClick={() => setIsMobileMenuOpen(false)}>
+            <X className="h-5 w-5" />
+          </Button>
+        </div>
+        <div className="flex flex-col gap-6 p-6 text-lg font-medium">
+          <Link href="/" className="transition-colors hover:text-primary">{t('home')}</Link>
+          <Link href="/products" className="transition-colors hover:text-primary">{t('shop')}</Link>
+          <Link href="/lab-analysis" className="transition-colors hover:text-primary">{t('provenance')}</Link>
+          <Link href="/track-order" className="transition-colors hover:text-primary">{t('track')}</Link>
         </div>
       </div>
     </header>
