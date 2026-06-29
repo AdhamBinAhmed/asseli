@@ -100,7 +100,7 @@ export function Navbar() {
         onClick={() => setIsMobileMenuOpen(false)}
       />
       <div 
-        className={`fixed top-0 bottom-0 left-0 z-50 w-[75%] max-w-sm bg-white/95 backdrop-blur-xl text-black border-r border-black/10 shadow-[20px_0_40px_rgba(0,0,0,0.5)] transition-transform duration-300 ease-out md:hidden flex flex-col ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}
+        className={`fixed top-0 bottom-0 z-50 w-[75%] max-w-sm bg-white/95 backdrop-blur-xl text-black shadow-2xl transition-transform duration-300 ease-out md:hidden flex flex-col ${locale === 'ar' ? 'right-0 border-l border-black/10' : 'left-0 border-r border-black/10'} ${isMobileMenuOpen ? 'translate-x-0' : (locale === 'ar' ? 'translate-x-full' : '-translate-x-full')}`}
       >
         <div className="flex items-center justify-between p-5 border-b border-black/10">
           <span className="text-2xl font-bold tracking-widest text-amber-500 uppercase">Asseli</span>
