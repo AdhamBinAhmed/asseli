@@ -4,6 +4,7 @@ import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase/config';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { logAudit } from '@/app/actions/auth';
 
 export default function AdminSettings() {
   const [color, setColor] = useState('#d4af37'); // Default amber
@@ -49,6 +50,7 @@ export default function AdminSettings() {
         facebookLink: facebook,
         instagramLink: instagram
       }, { merge: true });
+      await logAudit(`Updated Global Settings`, `Color: ${color}, Maintenance: ${maintenance}`);
       alert('Settings saved successfully!');
     } catch (e) {
       console.error(e);

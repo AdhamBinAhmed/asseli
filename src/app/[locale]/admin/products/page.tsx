@@ -8,7 +8,7 @@ import { Trash2, UploadCloud } from 'lucide-react';
 import { Product } from '@/store/useCartStore';
 import { uploadImage } from '@/app/actions/upload';
 import { Link } from '@/i18n/routing';
-import { getAdminRole } from '@/app/actions/auth';
+import { getAdminRole, logAudit } from '@/app/actions/auth';
 import { updateDoc } from 'firebase/firestore';
 
 export default function AdminProducts() {
@@ -106,6 +106,7 @@ export default function AdminProducts() {
     e.preventDefault();
     try {
       await addDoc(collection(db, 'products'), newProduct);
+      await logAudit('Added Product', `Name: ${newProduct.name}, Price: ${newProduct.price}`);
       setNewProduct({ name: '', price: '', weight: '', batch: '', image: '' });
       fetchProducts();
     } catch (e) {
@@ -113,9 +114,10 @@ export default function AdminProducts() {
     }
   };
 
-  const handleDelete = async (id: string) => {
+  const handleDelete = async (id: string, name: string) => {
     try {
       await deleteDoc(doc(db, 'products', id));
+      await logAudit('Deleted Product', `Name: ${name}`);
       fetchProducts();
     } catch (e) {
       console.error(e);
@@ -128,6 +130,7 @@ export default function AdminProducts() {
       for (const p of products) {
         await deleteDoc(doc(db, 'products', p.id));
       }
+      await logAudit('Deleted All Products', `Deleted ${products.length} products`);
       fetchProducts();
     } catch (e) {
       console.error(e);
@@ -144,10 +147,15 @@ export default function AdminProducts() {
   const saveBulkPrices = async () => {
     setIsSavingPrices(true);
     try {
+      let count = 0;
       for (const [id, newPrice] of Object.entries(bulkPrices)) {
         if (newPrice) {
           await updateDoc(doc(db, 'products', id), { price: newPrice });
+          count++;
         }
+      }
+      if (count > 0) {
+        await logAudit('Bulk Price Update', `Updated prices for ${count} products`);
       }
       alert('Prices updated successfully!');
       setBulkPrices({});
@@ -279,7 +287,7 @@ export default function AdminProducts() {
                     </div>
                   </div>
                   {isSuperAdmin && (
-                    <Button variant="ghost" size="icon" onClick={() => handleDelete(product.id)} className="text-destructive hover:text-destructive hover:bg-destructive/10">
+                    <Button variant="ghost" size="icon" onClick={() => handleDelete(product.id, product.name)} className="text-destructive hover:text-destructive hover:bg-destructive/10">
                       <Trash2 className="w-5 h-5" />
                     </Button>
                   )}

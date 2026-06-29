@@ -6,7 +6,7 @@ import { db } from '@/lib/firebase/config';
 import { Button } from '@/components/ui/button';
 import { Trash2, CheckCircle, XCircle, Clock } from 'lucide-react';
 import { Link } from '@/i18n/routing';
-import { getAdminRole } from '@/app/actions/auth';
+import { getAdminRole, logAudit } from '@/app/actions/auth';
 
 interface OrderItem {
   id: string;
@@ -63,6 +63,7 @@ export default function AdminOrders() {
   const updateStatus = async (id: string, newStatus: 'pending' | 'accepted' | 'refused') => {
     try {
       await updateDoc(doc(db, 'orders', id), { status: newStatus });
+      await logAudit(`Updated Order Status`, `Order ID: ${id.slice(-6)} set to ${newStatus}`);
       fetchOrders();
     } catch (e) {
       console.error(e);
@@ -73,6 +74,7 @@ export default function AdminOrders() {
     if (!confirm('Are you sure you want to delete this order entirely?')) return;
     try {
       await deleteDoc(doc(db, 'orders', id));
+      await logAudit(`Deleted Order`, `Order ID: ${id.slice(-6)}`);
       fetchOrders();
     } catch (e) {
       console.error(e);
@@ -86,6 +88,7 @@ export default function AdminOrders() {
       for (const order of toDelete) {
         await deleteDoc(doc(db, 'orders', order.id));
       }
+      await logAudit(`Deleted Pending/Refused Orders`, `Deleted ${toDelete.length} orders`);
       fetchOrders();
     } catch (e) {
       console.error(e);

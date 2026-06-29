@@ -1,6 +1,6 @@
 import { Link } from '@/i18n/routing';
 import { Button } from '@/components/ui/button';
-import { Package, ShoppingBag, LogOut, Settings } from 'lucide-react';
+import { Package, ShoppingBag, LogOut, Settings, Users, FileText } from 'lucide-react';
 import { logoutAdmin, getAdminRole } from '@/app/actions/auth';
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -24,11 +24,23 @@ export default async function AdminLayout({ children }: { children: React.ReactN
             </Button>
           </Link>
           {isSuperAdmin && (
-            <Link href="/admin/settings">
-              <Button variant="ghost" className="w-auto md:w-full justify-start text-sm md:text-lg h-10 md:h-12 flex-shrink-0 px-3 md:px-4">
-                <Settings className="mr-2 md:mr-3 h-4 md:h-5 w-4 md:w-5" /> Settings
-              </Button>
-            </Link>
+            <>
+              <Link href="/admin/users">
+                <Button variant="ghost" className="w-auto md:w-full justify-start text-sm md:text-lg h-10 md:h-12 flex-shrink-0 px-3 md:px-4">
+                  <Users className="mr-2 md:mr-3 h-4 md:h-5 w-4 md:w-5" /> Admins
+                </Button>
+              </Link>
+              <Link href="/admin/logs">
+                <Button variant="ghost" className="w-auto md:w-full justify-start text-sm md:text-lg h-10 md:h-12 flex-shrink-0 px-3 md:px-4">
+                  <FileText className="mr-2 md:mr-3 h-4 md:h-5 w-4 md:w-5" /> Audit Log
+                </Button>
+              </Link>
+              <Link href="/admin/settings">
+                <Button variant="ghost" className="w-auto md:w-full justify-start text-sm md:text-lg h-10 md:h-12 flex-shrink-0 px-3 md:px-4">
+                  <Settings className="mr-2 md:mr-3 h-4 md:h-5 w-4 md:w-5" /> Settings
+                </Button>
+              </Link>
+            </>
           )}
           <div className="mt-0 md:mt-auto ml-auto md:ml-0">
             <form action={logoutAdmin}>
