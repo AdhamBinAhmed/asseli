@@ -4,7 +4,7 @@ import { collection, getDocs, addDoc, deleteDoc, doc } from 'firebase/firestore'
 import { db } from '@/lib/firebase/config';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Trash2 } from 'lucide-react';
+import { Trash2, UploadCloud } from 'lucide-react';
 import { Product } from '@/store/useCartStore';
 import { uploadImage } from '@/app/actions/upload';
 
@@ -13,6 +13,7 @@ export default function AdminProducts() {
   const [isLoading, setIsLoading] = useState(true);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadError, setUploadError] = useState('');
+  const [isDragging, setIsDragging] = useState(false);
   
   const [newProduct, setNewProduct] = useState({
     name: '',
@@ -41,10 +42,34 @@ export default function AdminProducts() {
     fetchProducts();
   }, []);
 
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+  };
+
+  const handleDrop = async (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+    
+    const file = e.dataTransfer.files?.[0];
+    if (file && file.type.startsWith('image/')) {
+      await processImage(file);
+    }
+  };
+
   const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (!file) return;
+    if (file) {
+      await processImage(file);
+    }
+  };
 
+  const processImage = async (file: File) => {
     setIsUploading(true);
     setUploadError('');
 
@@ -102,20 +127,51 @@ export default function AdminProducts() {
             
             <div className="flex flex-col gap-2 p-4 border border-border/50 rounded-xl bg-muted/20">
               <label className="text-sm font-medium">Product Image</label>
-              <div className="flex items-center gap-4">
-                <Input 
+              
+              <div 
+                className={`relative flex flex-col items-center justify-center p-8 border-2 border-dashed rounded-xl transition-colors cursor-pointer overflow-hidden ${
+                  isDragging ? 'border-primary bg-primary/5' : 'border-border/50 hover:border-primary/50'
+                } ${newProduct.image ? 'border-none p-0 h-48' : ''}`}
+                onDragOver={handleDragOver}
+                onDragLeave={handleDragLeave}
+                onDrop={handleDrop}
+                onClick={() => !newProduct.image && document.getElementById('fileUpload')?.click()}
+              >
+                <input 
+                  id="fileUpload"
                   type="file" 
                   accept="image/*" 
                   onChange={handleImageChange} 
                   disabled={isUploading}
-                  className="bg-background cursor-pointer"
+                  className="hidden"
                 />
-                {newProduct.image && (
-                  <img src={newProduct.image} alt="Preview" className="w-12 h-12 rounded-md object-cover border border-border/50 shadow-sm" />
+
+                {newProduct.image ? (
+                  <div className="relative w-full h-full group">
+                    <img src={newProduct.image} alt="Preview" className="w-full h-full object-cover" />
+                    <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                      <Button variant="secondary" size="sm" onClick={(e) => { e.stopPropagation(); setNewProduct(prev => ({...prev, image: ''})); }}>
+                        Remove Image
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center text-muted-foreground pointer-events-none">
+                    <UploadCloud className="w-10 h-10 mb-4" />
+                    <p className="text-sm font-medium text-foreground">Click or drag image here</p>
+                    <p className="text-xs mt-1">SVG, PNG, JPG or WEBP (max. 5MB)</p>
+                  </div>
+                )}
+
+                {isUploading && (
+                  <div className="absolute inset-0 bg-background/80 backdrop-blur-sm flex flex-col items-center justify-center">
+                    <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin mb-4"></div>
+                    <p className="text-sm font-medium">Uploading to Cloudinary...</p>
+                  </div>
                 )}
               </div>
-              {isUploading && <p className="text-xs text-primary font-medium">Uploading to Cloudinary...</p>}
-              {uploadError && <p className="text-xs text-destructive">{uploadError}</p>}
+
+              {uploadError && <p className="text-xs text-destructive mt-1">{uploadError}</p>}
             </div>
 
             <Button type="submit" className="mt-2" disabled={!newProduct.image || isUploading}>Add Product</Button>
