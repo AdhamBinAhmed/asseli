@@ -40,7 +40,7 @@ export default async function RootLayout({
 
   return (
     <html lang={locale} dir={locale === 'ar' ? 'rtl' : 'ltr'}>
-      <body className="flex flex-col min-h-screen bg-background text-foreground antialiased selection:bg-primary/20 selection:text-primary transition-colors duration-1000 ease-in-out">
+      <body className="flex flex-col min-h-screen bg-background bg-[url('/phone-back.jpg')] md:bg-[url('/pc-back.jpg')] bg-cover bg-center bg-fixed text-foreground antialiased selection:bg-primary/20 selection:text-primary transition-colors duration-1000 ease-in-out">
         <NextIntlClientProvider messages={messages}>
           <Navbar />
           <main className="flex-1 flex flex-col relative">

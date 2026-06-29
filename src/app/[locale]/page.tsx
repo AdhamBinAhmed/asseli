@@ -257,7 +257,7 @@ export default function Home() {
     <div className="relative h-[calc(100vh-4rem)] w-full overflow-hidden text-white flex items-center justify-center -mt-1" ref={containerRef}>
 
       {/* Dynamic Background */}
-      <div ref={bgRef} className="absolute inset-0 -z-20 transition-all pointer-events-none" />
+      <div ref={bgRef} className="fixed inset-0 -z-50 transition-all pointer-events-none" />
 
       <div className="flex flex-col md:flex-row justify-between items-center md:items-stretch w-full h-full max-w-screen-2xl px-4 md:px-8 z-10 relative pointer-events-none">
 
