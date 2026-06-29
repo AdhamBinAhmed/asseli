@@ -1,11 +1,22 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, createContext, useContext } from 'react';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase/config';
 import { usePathname } from 'next/navigation';
 
+export interface GlobalSettings {
+  phoneNumber?: string;
+  whatsappLink?: string;
+  facebookLink?: string;
+  instagramLink?: string;
+}
+
+const SettingsContext = createContext<GlobalSettings>({});
+export const useGlobalSettings = () => useContext(SettingsContext);
+
 export function GlobalSettingsProvider({ children }: { children: React.ReactNode }) {
   const [isMaintenance, setIsMaintenance] = useState(false);
+  const [settings, setSettings] = useState<GlobalSettings>({});
   const [isLoading, setIsLoading] = useState(true);
   const pathname = usePathname();
 
@@ -23,6 +34,12 @@ export function GlobalSettingsProvider({ children }: { children: React.ReactNode
           if (data.maintenanceMode) {
             setIsMaintenance(true);
           }
+          setSettings({
+            phoneNumber: data.phoneNumber,
+            whatsappLink: data.whatsappLink,
+            facebookLink: data.facebookLink,
+            instagramLink: data.instagramLink,
+          });
         }
       } catch (e) {
         console.error('Failed to load global settings', e);
@@ -51,5 +68,5 @@ export function GlobalSettingsProvider({ children }: { children: React.ReactNode
     );
   }
 
-  return <>{children}</>;
+  return <SettingsContext.Provider value={settings}>{children}</SettingsContext.Provider>;
 }

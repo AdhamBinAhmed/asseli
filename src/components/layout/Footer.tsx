@@ -3,6 +3,7 @@
 import { useTranslations } from 'next-intl';
 import { Phone } from 'lucide-react';
 import { Link } from '@/i18n/routing';
+import { useGlobalSettings } from './GlobalSettingsProvider';
 
 const FacebookIcon = ({ className }: { className?: string }) => (
   <svg className={className} fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -25,6 +26,12 @@ const WhatsappIcon = ({ className }: { className?: string }) => (
 export function Footer() {
   const t = useTranslations('Footer');
   const currentYear = new Date().getFullYear();
+  const { phoneNumber, whatsappLink, facebookLink, instagramLink } = useGlobalSettings();
+
+  const phone = phoneNumber || '0100 000 0000';
+  const whatsapp = whatsappLink || 'https://wa.me/201000000000';
+  const facebook = facebookLink || 'https://facebook.com';
+  const instagram = instagramLink || 'https://instagram.com';
 
   return (
     <footer className="w-full bg-card/80 backdrop-blur-md border-t border-border/50 py-12 mt-auto relative z-10">
@@ -33,26 +40,30 @@ export function Footer() {
         {/* Social Media & Contact Links */}
         <div className="flex flex-wrap items-center justify-center gap-6">
           {/* Phone */}
-          <a href="tel:+201000000000" className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors">
+          <a href={`tel:${phone}`} className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors">
             <Phone className="w-5 h-5" />
-            <span className="text-sm font-medium">0100 000 0000</span>
+            <span className="text-sm font-medium">{phone}</span>
           </a>
           
           {/* WhatsApp */}
-          <a href="https://wa.me/201000000000" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors">
+          <a href={whatsapp} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors">
             <WhatsappIcon className="w-5 h-5" />
             <span className="text-sm font-medium">{t('whatsapp')}</span>
           </a>
 
           {/* Facebook */}
-          <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors">
-            <FacebookIcon className="w-5 h-5" />
-          </a>
+          {facebook && (
+            <a href={facebook} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors">
+              <FacebookIcon className="w-5 h-5" />
+            </a>
+          )}
 
           {/* Instagram */}
-          <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors">
-            <InstagramIcon className="w-5 h-5" />
-          </a>
+          {instagram && (
+            <a href={instagram} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors">
+              <InstagramIcon className="w-5 h-5" />
+            </a>
+          )}
         </div>
 
         <div className="w-24 h-px bg-border/80"></div>
