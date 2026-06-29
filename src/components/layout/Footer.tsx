@@ -59,7 +59,7 @@ export function Footer() {
 
         {/* Copyright & Powered By */}
         <div className="flex flex-col gap-2 items-center text-sm text-muted-foreground" dir="ltr">
-          <p>All rights reserved to Asseli & Mega Devs &copy; {currentYear}</p>
+          <p>All rights reserved to Asseli &copy; {currentYear}</p>
           <p>
             Powered by{' '}
             <a 
