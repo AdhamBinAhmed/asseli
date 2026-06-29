@@ -176,7 +176,7 @@ export default function CartPage() {
               
               <div className="mt-2">
                 <span className="text-sm text-muted-foreground block mb-2">{t('shippingOptions')}</span>
-                <Select onValueChange={setSelectedGov}>
+                <Select onValueChange={(val) => setSelectedGov(val || '')}>
                   <SelectTrigger className="w-full">
                     <SelectValue placeholder={t('selectGovernorate')} />
                   </SelectTrigger>
