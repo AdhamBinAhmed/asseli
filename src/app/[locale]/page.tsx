@@ -300,7 +300,7 @@ export default function Home() {
                 <span className="text-xs text-white/70">Raw Honey</span>
               </div>
               <div onClick={() => switchTheme('dark')} className={`cursor-pointer bg-black/20 backdrop-blur-md border ${flavor === 'dark' ? 'border-amber-400 border-2' : 'border-white/20 hover:bg-black/40'} p-4 pt-16 rounded-3xl flex flex-col items-center w-32 transition-all relative shadow-xl`}>
-                <img src="/honey-dark.png" alt="Dark Forest Honey" width="90" height="90" className="absolute -top-10 drop-shadow-2xl pointer-events-none object-contain" />
+                <img src="/honey-dark.png" alt="Dark Forest Honey" width="105" height="105" className="absolute -top-12 drop-shadow-2xl pointer-events-none object-contain" />
                 <span className="font-bold text-sm mt-2">Dark Forest</span>
                 <span className="text-xs text-white/70">Premium Blend</span>
               </div>
