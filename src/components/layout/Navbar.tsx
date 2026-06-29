@@ -37,7 +37,8 @@ export function Navbar() {
   };
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/40 backdrop-blur-md">
+    <>
+      <header className="sticky top-0 z-40 w-full border-b border-border/40 bg-background/40 backdrop-blur-md">
       <div className="container mx-auto flex h-16 items-center justify-between px-4 md:px-8">
         
         {/* Mobile Menu Toggle */}
@@ -91,6 +92,7 @@ export function Navbar() {
           </Link>
         </div>
       </div>
+      </header>
 
       {/* Mobile Menu Overlay & Drawer */}
       <div 
@@ -113,6 +115,6 @@ export function Navbar() {
           <Link href="/track-order" className="transition-colors text-black/70 hover:text-amber-500">{t('track')}</Link>
         </div>
       </div>
-    </header>
+    </>
   );
 }
