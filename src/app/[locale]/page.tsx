@@ -271,7 +271,7 @@ export default function Home() {
             {t('description')}
           </p>
           <div className="mt-1 md:mt-4">
-            <Link href="/products">
+            <Link href="/lab-analysis">
               <button className="flex items-center gap-4 bg-black/50 hover:bg-black/80 text-white rounded-full px-2 py-2 pr-6 font-bold transition-all shadow-xl backdrop-blur-md">
                 <span className="bg-amber-400 text-black w-10 h-10 rounded-full flex items-center justify-center"><Plus /></span>
                 {t('cta')}
