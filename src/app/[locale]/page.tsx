@@ -295,12 +295,12 @@ export default function Home() {
           <div className="flex flex-col gap-4 md:gap-6 items-center md:items-end pb-2 md:pb-8">
             <div className="flex gap-3 md:gap-4">
               <div onClick={() => switchTheme('classic')} className={`cursor-pointer bg-black/20 backdrop-blur-md border ${flavor === 'classic' ? 'border-amber-400 border-2' : 'border-white/20 hover:bg-black/40'} p-2 md:p-4 pt-10 md:pt-16 rounded-2xl md:rounded-3xl flex flex-col items-center w-24 sm:w-28 md:w-32 transition-all relative shadow-xl`}>
-                <img src="/honey-light.png" alt={t('classicAmber')} width="78" height="78" className="absolute -top-8 sm:-top-10 md:-top-10 drop-shadow-2xl pointer-events-none object-contain" />
+                <img src="/honey-light.png" alt={t('classicAmber')} width="70" height="70" className="absolute -top-8 sm:-top-10 md:-top-10 drop-shadow-2xl pointer-events-none object-contain" />
                 <span className="font-bold text-[11px] sm:text-xs md:text-sm mt-1 md:mt-2 text-center leading-tight">{t('classicAmber')}</span>
                 <span className="text-[9px] sm:text-[10px] md:text-xs text-white/70 text-center">{t('rawHoney')}</span>
               </div>
               <div onClick={() => switchTheme('dark')} className={`cursor-pointer bg-black/20 backdrop-blur-md border ${flavor === 'dark' ? 'border-amber-400 border-2' : 'border-white/20 hover:bg-black/40'} p-2 md:p-4 pt-10 md:pt-16 rounded-2xl md:rounded-3xl flex flex-col items-center w-24 sm:w-28 md:w-32 transition-all relative shadow-xl`}>
-                <img src="/honey-dark.png" alt={t('darkForest')} width="95" height="95" className="absolute -top-10 sm:-top-12 md:-top-12 drop-shadow-2xl pointer-events-none object-contain" />
+                <img src="/honey-dark.png" alt={t('darkForest')} width="160" height="160" className="absolute -top-10 sm:-top-12 md:-top-12 drop-shadow-2xl pointer-events-none object-contain" />
                 <span className="font-bold text-[11px] sm:text-xs md:text-sm mt-1 md:mt-2 text-center leading-tight">{t('darkForest')}</span>
                 <span className="text-[9px] sm:text-[10px] md:text-xs text-white/70 text-center">{t('premiumBlend')}</span>
               </div>
