@@ -3,8 +3,7 @@
 import { cookies } from 'next/headers';
 
 export async function loginAdmin(password: string, locale: string) {
-  // Hardcoded password verification directly on the server to avoid Vercel environment variable issues
-  if (password === 'asseli123') {
+  if (password === process.env.ADMIN_PASSWORD) {
     (await cookies()).set('admin_token', 'authenticated', {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
