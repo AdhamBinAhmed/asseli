@@ -99,10 +99,10 @@ export default function AdminOrders() {
   };
 
   return (
-    <div className="p-8 max-w-7xl mx-auto w-full">
-      <div className="flex items-center justify-between mb-8">
-        <h1 className="text-3xl font-bold">Manage Orders</h1>
-        <div className="flex gap-4 items-center">
+    <div className="p-4 md:p-8 max-w-7xl mx-auto w-full">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 md:mb-8 gap-4">
+        <h1 className="text-2xl md:text-3xl font-bold">Manage Orders</h1>
+        <div className="flex flex-wrap gap-2 md:gap-4 items-center">
           {isSuperAdmin && (
             <Button variant="destructive" onClick={handleDeletePendingRefused}>
               Delete Pending/Refused
@@ -124,20 +124,20 @@ export default function AdminOrders() {
           {orders.length === 0 && <p className="text-muted-foreground">No orders found.</p>}
           
           {orders.map(order => (
-            <div key={order.id} className="p-6 border border-border/50 rounded-2xl bg-card flex flex-col md:flex-row gap-6">
+            <div key={order.id} className="p-4 md:p-6 border border-border/50 rounded-2xl bg-card flex flex-col md:flex-row gap-4 md:gap-6">
               
               <div className="flex-1">
-                <div className="flex items-center gap-3 mb-2">
+                <div className="flex items-center gap-2 md:gap-3 mb-2">
                   <StatusIcon status={order.status || 'pending'} />
-                  <span className="font-semibold text-lg uppercase tracking-wider">{order.status || 'pending'}</span>
-                  <span className="text-xs text-muted-foreground ml-auto bg-muted px-2 py-1 rounded-md">ID: {order.id}</span>
+                  <span className="font-semibold text-base md:text-lg uppercase tracking-wider">{order.status || 'pending'}</span>
+                  <span className="text-[10px] md:text-xs text-muted-foreground ml-auto bg-muted px-2 py-1 rounded-md">ID: {order.id.slice(-6)}</span>
                 </div>
                 
-                <h3 className="text-xl font-bold mb-1">{order.customerName}</h3>
-                <p className="text-sm text-muted-foreground mb-4">
+                <h3 className="text-lg md:text-xl font-bold mb-1">{order.customerName}</h3>
+                <p className="text-xs md:text-sm text-muted-foreground mb-4">
                   {order.customerPhone} • {order.customerAddress}, {order.governorate}
                   <br/>
-                  <span className="text-xs">{new Date(order.date).toLocaleString()}</span>
+                  <span className="text-[10px] md:text-xs">{new Date(order.date).toLocaleString()}</span>
                 </p>
 
                 <div className="bg-muted/30 rounded-xl p-4 border border-border/20">
@@ -157,23 +157,24 @@ export default function AdminOrders() {
                 </div>
               </div>
 
-              <div className="flex flex-row md:flex-col gap-2 justify-end items-end md:items-stretch min-w-[140px]">
+              <div className="flex flex-row md:flex-col gap-2 justify-end items-end md:items-stretch min-w-[140px] mt-4 md:mt-0 border-t md:border-t-0 pt-4 md:pt-0 border-border/50 w-full md:w-auto">
                 <Button 
                   variant={order.status === 'accepted' ? 'default' : 'outline'} 
-                  className={order.status === 'accepted' ? 'bg-emerald-600 hover:bg-emerald-700 text-white' : ''}
+                  className={`flex-1 md:flex-none ${order.status === 'accepted' ? 'bg-emerald-600 hover:bg-emerald-700 text-white' : ''}`}
                   onClick={() => updateStatus(order.id, 'accepted')}
                 >
                   Accept
                 </Button>
                 <Button 
                   variant={order.status === 'refused' ? 'destructive' : 'outline'}
+                  className="flex-1 md:flex-none"
                   onClick={() => updateStatus(order.id, 'refused')}
                 >
                   Refuse
                 </Button>
                 <div className="flex-1 hidden md:block"></div>
                 {isSuperAdmin && (
-                  <Button variant="ghost" className="text-destructive hover:bg-destructive/10 mt-auto" onClick={() => handleDelete(order.id)}>
+                  <Button variant="ghost" className="flex-1 md:flex-none text-destructive hover:bg-destructive/10 mt-0 md:mt-auto" onClick={() => handleDelete(order.id)}>
                     <Trash2 className="w-4 h-4 mr-2" /> Delete
                   </Button>
                 )}

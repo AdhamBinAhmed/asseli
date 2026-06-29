@@ -161,9 +161,9 @@ export default function AdminProducts() {
   };
 
   return (
-    <div className="p-8 max-w-7xl mx-auto w-full">
-      <div className="flex items-center justify-between mb-8">
-        <h1 className="text-3xl font-bold">Manage Products</h1>
+    <div className="p-4 md:p-8 max-w-7xl mx-auto w-full">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 md:mb-8 gap-4">
+        <h1 className="text-2xl md:text-3xl font-bold">Manage Products</h1>
         <div className="flex gap-4">
           <Link href="/admin/products">
             <Button>Manage Products</Button>
@@ -174,9 +174,9 @@ export default function AdminProducts() {
         </div>
       </div>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-12">
         {/* Add Product Form */}
-        <div className="bg-card p-6 rounded-2xl border border-border/50">
+        <div className="bg-card p-4 md:p-6 rounded-2xl border border-border/50">
           <h2 className="text-xl font-semibold mb-6">Add New Product</h2>
           <form onSubmit={handleAdd} className="flex flex-col gap-4">
             <Input placeholder="Product Name (e.g. Sidr Honey)" value={newProduct.name} onChange={e => setNewProduct({...newProduct, name: e.target.value})} required />
@@ -263,18 +263,18 @@ export default function AdminProducts() {
                   <div className="flex items-center gap-4">
                     <img src={product.image} alt={product.name} className="w-12 h-12 rounded-md object-cover bg-muted" />
                     <div>
-                      <p className="font-medium">{product.name}</p>
+                      <p className="font-medium text-sm md:text-base">{product.name}</p>
                       {isSuperAdmin ? (
-                        <div className="flex items-center gap-2 mt-1">
+                        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-1 sm:gap-2 mt-1">
                           <Input 
                             value={bulkPrices[product.id] !== undefined ? bulkPrices[product.id] : product.price} 
                             onChange={(e) => handleBulkPriceChange(product.id, e.target.value)} 
-                            className="w-24 h-8 text-xs" 
+                            className="w-20 md:w-24 h-7 md:h-8 text-xs" 
                           />
-                          <span className="text-xs text-muted-foreground">• Batch {product.batch}</span>
+                          <span className="text-[10px] md:text-xs text-muted-foreground">Batch {product.batch}</span>
                         </div>
                       ) : (
-                        <p className="text-sm text-muted-foreground">{product.price} • Batch {product.batch}</p>
+                        <p className="text-xs md:text-sm text-muted-foreground">{product.price} • Batch {product.batch}</p>
                       )}
                     </div>
                   </div>

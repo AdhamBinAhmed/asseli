@@ -46,17 +46,17 @@ export default function AdminSettings() {
   };
 
   return (
-    <div className="p-8 max-w-7xl mx-auto w-full">
-      <h1 className="text-3xl font-bold mb-8">Global Settings</h1>
+    <div className="p-4 md:p-8 max-w-7xl mx-auto w-full">
+      <h1 className="text-2xl md:text-3xl font-bold mb-6 md:mb-8">Global Settings</h1>
       
       {isLoading ? (
         <p className="text-muted-foreground">Loading settings...</p>
       ) : (
         <div className="flex flex-col gap-8 max-w-md">
           
-          <div className="bg-card p-6 rounded-2xl border border-border/50 flex flex-col gap-4 shadow-sm">
-            <h2 className="text-xl font-semibold">Website Main Color</h2>
-            <p className="text-sm text-muted-foreground">Choose the primary color for the website's theme.</p>
+          <div className="bg-card p-4 md:p-6 rounded-2xl border border-border/50 flex flex-col gap-4 shadow-sm">
+            <h2 className="text-lg md:text-xl font-semibold">Website Main Color</h2>
+            <p className="text-xs md:text-sm text-muted-foreground">Choose the primary color for the website's theme.</p>
             <div className="flex items-center gap-4">
               <input 
                 type="color" 
@@ -68,9 +68,9 @@ export default function AdminSettings() {
             </div>
           </div>
 
-          <div className="bg-card p-6 rounded-2xl border border-border/50 flex flex-col gap-4 shadow-sm">
-            <h2 className="text-xl font-semibold">Maintenance Mode</h2>
-            <p className="text-sm text-muted-foreground">If enabled, standard users will only see a maintenance screen. Admins can still access the site.</p>
+          <div className="bg-card p-4 md:p-6 rounded-2xl border border-border/50 flex flex-col gap-4 shadow-sm">
+            <h2 className="text-lg md:text-xl font-semibold">Maintenance Mode</h2>
+            <p className="text-xs md:text-sm text-muted-foreground">If enabled, standard users will only see a maintenance screen. Admins can still access the site.</p>
             <Button 
               variant={maintenance ? 'destructive' : 'outline'} 
               className={maintenance ? '' : 'bg-emerald-600 hover:bg-emerald-700 text-white'}
