@@ -94,23 +94,23 @@ export function Navbar() {
 
       {/* Mobile Menu Overlay & Drawer */}
       <div 
-        className={`fixed inset-0 z-50 bg-black/60 backdrop-blur-sm transition-opacity duration-300 md:hidden ${isMobileMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
+        className={`fixed inset-0 z-50 bg-black/40 backdrop-blur-md transition-opacity duration-300 md:hidden ${isMobileMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
         onClick={() => setIsMobileMenuOpen(false)}
       />
       <div 
-        className={`fixed top-0 bottom-0 right-0 z-50 w-[70%] bg-background border-l border-border/40 shadow-2xl transition-transform duration-300 ease-in-out md:hidden flex flex-col ${isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}
+        className={`fixed top-0 bottom-0 left-0 z-50 w-[75%] max-w-sm bg-white/95 backdrop-blur-xl text-black border-r border-black/10 shadow-[20px_0_40px_rgba(0,0,0,0.5)] transition-transform duration-300 ease-out md:hidden flex flex-col ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}
       >
-        <div className="flex items-center justify-between p-4 border-b border-border/40">
-          <span className="text-xl font-bold tracking-widest text-primary uppercase">Asseli</span>
-          <Button variant="ghost" size="icon" onClick={() => setIsMobileMenuOpen(false)}>
-            <X className="h-5 w-5" />
+        <div className="flex items-center justify-between p-5 border-b border-black/10">
+          <span className="text-2xl font-bold tracking-widest text-amber-500 uppercase">Asseli</span>
+          <Button variant="ghost" size="icon" className="text-black hover:bg-black/5 hover:text-black rounded-full" onClick={() => setIsMobileMenuOpen(false)}>
+            <X className="h-6 w-6" />
           </Button>
         </div>
-        <div className="flex flex-col gap-6 p-6 text-lg font-medium">
-          <Link href="/" className="transition-colors hover:text-primary">{t('home')}</Link>
-          <Link href="/products" className="transition-colors hover:text-primary">{t('shop')}</Link>
-          <Link href="/lab-analysis" className="transition-colors hover:text-primary">{t('provenance')}</Link>
-          <Link href="/track-order" className="transition-colors hover:text-primary">{t('track')}</Link>
+        <div className="flex flex-col gap-6 p-8 text-xl font-medium">
+          <Link href="/" className="transition-colors text-black/70 hover:text-amber-500">{t('home')}</Link>
+          <Link href="/products" className="transition-colors text-black/70 hover:text-amber-500">{t('shop')}</Link>
+          <Link href="/lab-analysis" className="transition-colors text-black/70 hover:text-amber-500">{t('provenance')}</Link>
+          <Link href="/track-order" className="transition-colors text-black/70 hover:text-amber-500">{t('track')}</Link>
         </div>
       </div>
     </header>
