@@ -12,7 +12,7 @@ if (!process.env.CLOUDINARY_URL) {
   });
 }
 
-export async function uploadImage(formData: FormData) {
+export async function uploadImage(formData: FormData): Promise<{ success: boolean; url?: string; error?: string }> {
   try {
     const file = formData.get('file') as File;
     if (!file) return { success: false, error: 'No file provided' };
