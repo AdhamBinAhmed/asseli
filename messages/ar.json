@@ -13,6 +13,7 @@
   "Navbar": {
     "home": "الرئيسية",
     "shop": "المتجر",
+    "track": "تتبع الطلب",
     "provenance": "المصدر",
     "cartTitle": "سلة التسوق",
     "cartDesc": "راجع اختياراتك من العسل الفاخر.",
@@ -30,5 +31,20 @@
     "selectGovernorate": "اختر المحافظة",
     "checkout": "متابعة الدفع",
     "remove": "إزالة"
+  },
+  "TrackOrder": {
+    "title": "تتبع طلبك",
+    "description": "أدخل رقم الطلب لمعرفة حالته الحالية.",
+    "orderIdPlaceholder": "مثال: jX9s8df723",
+    "trackButton": "تتبع الطلب",
+    "status": "حالة الطلب",
+    "pending": "قيد الانتظار",
+    "accepted": "تم القبول",
+    "refused": "تم الرفض",
+    "notFound": "الطلب غير موجود. يرجى التحقق من الرقم.",
+    "orderDetails": "تفاصيل الطلب",
+    "items": "العناصر",
+    "total": "الإجمالي",
+    "shipping": "الشحن إلى"
   }
 }

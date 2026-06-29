@@ -11,21 +11,21 @@ const FLOAT_DURATIONS = [5, 7, 6, 8, 5.5, 6.5, 9, 11, 10];
 
 export default function Home() {
   const t = useTranslations('HomePage');
-  
+
   const bgRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const fgBerriesRef = useRef<HTMLDivElement>(null);
   const bgBerriesRef = useRef<HTMLDivElement>(null);
   const mainProductRef = useRef<HTMLImageElement>(null);
   const particlesRef = useRef<HTMLImageElement[]>([]);
-  
+
   const [flavor, setFlavor] = useState<'classic' | 'dark'>('classic');
   const [isSwitching, setIsSwitching] = useState(false);
-  
+
   const mouse = useRef({ x: 0, y: 0, px: 0, py: 0 });
   const currentMouse = useRef({ x: 0, y: 0 });
   const switchSpin = useRef(0);
-  
+
   useEffect(() => {
     // Initial Setup
     if (bgRef.current) {
@@ -53,13 +53,13 @@ export default function Home() {
       mouse.current.px = e.clientX;
       mouse.current.py = e.clientY;
     };
-    
+
     window.addEventListener('mousemove', handleMouseMove);
     let reqId: number;
 
     const animate = () => {
       const time = Date.now() * 0.001;
-      
+
       currentMouse.current.x += (mouse.current.x - currentMouse.current.x) * 0.05;
       currentMouse.current.y += (mouse.current.y - currentMouse.current.y) * 0.05;
 
@@ -122,7 +122,7 @@ export default function Home() {
     };
 
     reqId = requestAnimationFrame(animate);
-    
+
     // Bubbles Generator
     const createBubble = () => {
       if (!containerRef.current) return;
@@ -137,7 +137,7 @@ export default function Home() {
       bubble.style.bottom = '-50px';
       bubble.style.pointerEvents = 'none';
       bubble.style.zIndex = '0';
-      
+
       const duration = Math.random() * 6 + 4;
       bubble.animate([
         { transform: 'translateY(0) translateX(0)', opacity: 0 },
@@ -149,11 +149,11 @@ export default function Home() {
         easing: 'linear',
         fill: 'forwards'
       });
-      
+
       containerRef.current.appendChild(bubble);
       setTimeout(() => bubble.remove(), duration * 1000);
     };
-    
+
     const bubbleInterval = setInterval(createBubble, 400);
 
     return () => {
@@ -166,8 +166,8 @@ export default function Home() {
   const switchTheme = (newFlavor: 'classic' | 'dark') => {
     if (isSwitching || newFlavor === flavor) return;
     setIsSwitching(true);
-    
-    const targetColors = newFlavor === 'dark' ? 
+
+    const targetColors = newFlavor === 'dark' ?
       { inner: '#451a03', mid: '#1c1917', outer: '#0a0a0a' } : // Dark theme
       { inner: '#d97706', mid: '#92400e', outer: '#451a03' };  // Classic theme
 
@@ -192,7 +192,7 @@ export default function Home() {
       },
       onComplete: () => {
         setFlavor(newFlavor); // Instant swap image at peak blur
-        
+
         gsap.to(spinObj, {
           val: 720,
           blur: 0,
@@ -233,38 +233,38 @@ export default function Home() {
         x: centerX, y: centerY, rotation: startAngle + 45, scale: 0.1, opacity: 0,
         duration: 0.5, ease: "power2.in"
       })
-      .to(particle, { duration: 0.3 })
-      .to(particle, {
-        x: nextBaseX, y: nextBaseY, rotation: startAngle + 90, scale: 1, opacity: 1,
-        duration: 0.9, ease: "back.out(1.5)",
-        onComplete: () => {
-          particle.dataset.angle = (startAngle + 90).toString();
-          particle.dataset.baseX = nextBaseX.toString();
-          particle.dataset.baseY = nextBaseY.toString();
-          particle.dataset.rx = '0';
-          particle.dataset.ry = '0';
-          
-          completed++;
-          if (completed === particlesRef.current.length) {
-            setIsSwitching(false);
+        .to(particle, { duration: 0.3 })
+        .to(particle, {
+          x: nextBaseX, y: nextBaseY, rotation: startAngle + 90, scale: 1, opacity: 1,
+          duration: 0.9, ease: "back.out(1.5)",
+          onComplete: () => {
+            particle.dataset.angle = (startAngle + 90).toString();
+            particle.dataset.baseX = nextBaseX.toString();
+            particle.dataset.baseY = nextBaseY.toString();
+            particle.dataset.rx = '0';
+            particle.dataset.ry = '0';
+
+            completed++;
+            if (completed === particlesRef.current.length) {
+              setIsSwitching(false);
+            }
           }
-        }
-      });
+        });
     });
   };
 
   return (
     <div className="relative h-[calc(100vh-4rem)] w-full overflow-hidden text-white flex items-center justify-center -mt-1" ref={containerRef}>
-      
+
       {/* Dynamic Background */}
       <div ref={bgRef} className="absolute inset-0 -z-20 transition-all pointer-events-none" />
 
       <div className="flex flex-col md:flex-row justify-between items-stretch w-full h-full max-w-screen-2xl px-8 z-10 relative pointer-events-none">
-        
+
         {/* Left Column */}
         <div className="flex flex-col justify-center h-full md:w-1/3 gap-6 pointer-events-auto z-50">
           <h1 className="text-6xl md:text-8xl font-bold tracking-tight leading-none drop-shadow-xl" style={{ fontFamily: 'var(--font-geist-sans)' }}>
-            <span className="text-white/90 drop-shadow-lg text-stroke">Pure</span><br/>
+            <span className="text-white/90 drop-shadow-lg text-stroke">Pure</span><br />
             Nature
           </h1>
           <p className="text-lg text-white/90 max-w-sm drop-shadow-md">
@@ -278,7 +278,7 @@ export default function Home() {
               </button>
             </Link>
           </div>
-          
+
           <div className="flex items-center gap-4 mt-auto pb-8">
             <div className="w-12 h-12 rounded-xl bg-black/20 backdrop-blur-md border border-white/20 flex items-center justify-center shadow-lg">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" className="text-amber-400"><path d="M12 15L15 18L19 14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /><path d="M7 10L12 15L17 10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
@@ -300,14 +300,14 @@ export default function Home() {
                 <span className="text-xs text-white/70">Raw Honey</span>
               </div>
               <div onClick={() => switchTheme('dark')} className={`cursor-pointer bg-black/20 backdrop-blur-md border ${flavor === 'dark' ? 'border-amber-400 border-2' : 'border-white/20 hover:bg-black/40'} p-4 pt-16 rounded-3xl flex flex-col items-center w-32 transition-all relative shadow-xl`}>
-                <img src="/honey-dark.png" alt="Dark Forest Honey" width="105" height="105" className="absolute -top-12 drop-shadow-2xl pointer-events-none object-contain" />
+                <img src="/honey-dark.png" alt="Dark Forest Honey" width="115" height="115" className="absolute -top-12 drop-shadow-2xl pointer-events-none object-contain" />
                 <span className="font-bold text-sm mt-2">Dark Forest</span>
                 <span className="text-xs text-white/70">Premium Blend</span>
               </div>
             </div>
-            
+
             <h2 className="text-5xl md:text-6xl font-bold tracking-tight mt-8 drop-shadow-xl" style={{ fontFamily: 'var(--font-geist-sans)' }}>
-              <span className="text-white/90">Refreshingly</span><br/>
+              <span className="text-white/90">Refreshingly</span><br />
               Sweet
             </h2>
           </div>
@@ -317,10 +317,10 @@ export default function Home() {
 
       {/* Main Center Product (3D CSS Trick) */}
       <div className="absolute inset-0 flex items-center justify-center z-20 pointer-events-none" style={{ perspective: '1200px' }}>
-        <img 
+        <img
           ref={mainProductRef}
-          src={flavor === 'classic' ? '/honey-light.png' : '/honey-dark.png'} 
-          alt="Main Honey Jar" 
+          src={flavor === 'classic' ? '/honey-light.png' : '/honey-dark.png'}
+          alt="Main Honey Jar"
           className="w-[250px] md:w-[350px] lg:w-[450px] object-contain drop-shadow-[0_20px_50px_rgba(0,0,0,0.8)] absolute top-1/2 left-1/2"
           style={{ transformStyle: 'preserve-3d' }}
         />
@@ -328,21 +328,21 @@ export default function Home() {
 
       {/* Parallax Background Honeycombs */}
       <div ref={bgBerriesRef} className="absolute inset-0 pointer-events-none z-10">
-        <img src="/honeycomb.png" ref={el => { if(el) particlesRef.current[6] = el }} className="absolute top-[20%] left-[40%] w-24 opacity-60 drop-shadow-2xl" alt=""/>
-        <img src="/honeycomb.png" ref={el => { if(el) particlesRef.current[7] = el }} className="absolute top-[50%] left-[55%] w-20 opacity-50 drop-shadow-2xl" alt=""/>
-        <img src="/honeycomb.png" ref={el => { if(el) particlesRef.current[8] = el }} className="absolute top-[70%] left-[30%] w-28 opacity-40 drop-shadow-2xl" alt=""/>
+        <img src="/honeycomb.png" ref={el => { if (el) particlesRef.current[6] = el }} className="absolute top-[20%] left-[40%] w-24 opacity-60 drop-shadow-2xl" alt="" />
+        <img src="/honeycomb.png" ref={el => { if (el) particlesRef.current[7] = el }} className="absolute top-[50%] left-[55%] w-20 opacity-50 drop-shadow-2xl" alt="" />
+        <img src="/honeycomb.png" ref={el => { if (el) particlesRef.current[8] = el }} className="absolute top-[70%] left-[30%] w-28 opacity-40 drop-shadow-2xl" alt="" />
       </div>
 
       {/* Parallax Foreground Honeycombs */}
       <div ref={fgBerriesRef} className="absolute inset-0 pointer-events-none z-40">
-        <img src="/honeycomb.png" ref={el => { if(el) particlesRef.current[0] = el }} className="absolute top-[25%] left-[25%] w-40 drop-shadow-2xl" alt=""/>
-        <img src="/honeycomb.png" ref={el => { if(el) particlesRef.current[1] = el }} className="absolute top-[60%] left-[42%] w-24 drop-shadow-2xl" alt=""/>
-        <img src="/honeycomb.png" ref={el => { if(el) particlesRef.current[2] = el }} className="absolute top-[30%] left-[62%] w-48 drop-shadow-2xl" alt=""/>
-        <img src="/honeycomb.png" ref={el => { if(el) particlesRef.current[3] = el }} className="absolute top-[15%] left-[55%] w-32 drop-shadow-2xl" alt=""/>
-        <img src="/honeycomb.png" ref={el => { if(el) particlesRef.current[4] = el }} className="absolute top-[75%] left-[20%] w-28 drop-shadow-2xl" alt=""/>
-        <img src="/honeycomb.png" ref={el => { if(el) particlesRef.current[5] = el }} className="absolute top-[45%] left-[75%] w-36 drop-shadow-2xl" alt=""/>
+        <img src="/honeycomb.png" ref={el => { if (el) particlesRef.current[0] = el }} className="absolute top-[25%] left-[25%] w-40 drop-shadow-2xl" alt="" />
+        <img src="/honeycomb.png" ref={el => { if (el) particlesRef.current[1] = el }} className="absolute top-[60%] left-[42%] w-24 drop-shadow-2xl" alt="" />
+        <img src="/honeycomb.png" ref={el => { if (el) particlesRef.current[2] = el }} className="absolute top-[30%] left-[62%] w-48 drop-shadow-2xl" alt="" />
+        <img src="/honeycomb.png" ref={el => { if (el) particlesRef.current[3] = el }} className="absolute top-[15%] left-[55%] w-32 drop-shadow-2xl" alt="" />
+        <img src="/honeycomb.png" ref={el => { if (el) particlesRef.current[4] = el }} className="absolute top-[75%] left-[20%] w-28 drop-shadow-2xl" alt="" />
+        <img src="/honeycomb.png" ref={el => { if (el) particlesRef.current[5] = el }} className="absolute top-[45%] left-[75%] w-36 drop-shadow-2xl" alt="" />
       </div>
-      
+
     </div>
   );
 }
