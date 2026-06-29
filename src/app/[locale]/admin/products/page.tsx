@@ -6,10 +6,13 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Trash2 } from 'lucide-react';
 import { Product } from '@/store/useCartStore';
+import { uploadImage } from '@/app/actions/upload';
 
 export default function AdminProducts() {
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadError, setUploadError] = useState('');
   
   const [newProduct, setNewProduct] = useState({
     name: '',
@@ -37,6 +40,31 @@ export default function AdminProducts() {
   useEffect(() => {
     fetchProducts();
   }, []);
+
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsUploading(true);
+    setUploadError('');
+
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      
+      const res = await uploadImage(formData);
+      
+      if (res.success && res.url) {
+        setNewProduct(prev => ({ ...prev, image: res.url! }));
+      } else {
+        setUploadError(res.error || 'Failed to upload image');
+      }
+    } catch (err) {
+      setUploadError('An error occurred during upload');
+    } finally {
+      setIsUploading(false);
+    }
+  };
 
   const handleAdd = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -71,8 +99,26 @@ export default function AdminProducts() {
             <Input placeholder="Price (e.g. $120.00)" value={newProduct.price} onChange={e => setNewProduct({...newProduct, price: e.target.value})} required />
             <Input placeholder="Weight (e.g. 500g)" value={newProduct.weight} onChange={e => setNewProduct({...newProduct, weight: e.target.value})} required />
             <Input placeholder="Batch Number (e.g. #002)" value={newProduct.batch} onChange={e => setNewProduct({...newProduct, batch: e.target.value})} required />
-            <Input placeholder="Image URL (e.g. https://...)" value={newProduct.image} onChange={e => setNewProduct({...newProduct, image: e.target.value})} required />
-            <Button type="submit" className="mt-2">Add Product</Button>
+            
+            <div className="flex flex-col gap-2 p-4 border border-border/50 rounded-xl bg-muted/20">
+              <label className="text-sm font-medium">Product Image</label>
+              <div className="flex items-center gap-4">
+                <Input 
+                  type="file" 
+                  accept="image/*" 
+                  onChange={handleImageChange} 
+                  disabled={isUploading}
+                  className="bg-background cursor-pointer"
+                />
+                {newProduct.image && (
+                  <img src={newProduct.image} alt="Preview" className="w-12 h-12 rounded-md object-cover border border-border/50 shadow-sm" />
+                )}
+              </div>
+              {isUploading && <p className="text-xs text-primary font-medium">Uploading to Cloudinary...</p>}
+              {uploadError && <p className="text-xs text-destructive">{uploadError}</p>}
+            </div>
+
+            <Button type="submit" className="mt-2" disabled={!newProduct.image || isUploading}>Add Product</Button>
           </form>
         </div>
 
