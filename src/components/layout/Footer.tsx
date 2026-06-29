@@ -58,17 +58,17 @@ export function Footer() {
         <div className="w-24 h-px bg-border/80"></div>
 
         {/* Copyright & Powered By */}
-        <div className="flex flex-col gap-2 items-center text-sm text-muted-foreground">
-          <p>{t('rights')} &copy; {currentYear}</p>
+        <div className="flex flex-col gap-2 items-center text-sm text-muted-foreground" dir="ltr">
+          <p>All rights reserved to Asseli & Mega Devs &copy; {currentYear}</p>
           <p>
-            {t('poweredBy')}{' '}
+            Powered by{' '}
             <a 
               href="https://megadevs.site" 
               target="_blank" 
               rel="noopener noreferrer" 
               className="text-primary font-bold hover:underline"
             >
-              {t('megaDevs')}
+              Mega Devs
             </a>
           </p>
         </div>
