@@ -8,9 +8,12 @@ import { Trash2, UploadCloud } from 'lucide-react';
 import { Product } from '@/store/useCartStore';
 import { uploadImage } from '@/app/actions/upload';
 import { Link } from '@/i18n/routing';
+import { getAdminRole } from '@/app/actions/auth';
+import { updateDoc } from 'firebase/firestore';
 
 export default function AdminProducts() {
   const [products, setProducts] = useState<Product[]>([]);
+  const [role, setRole] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadError, setUploadError] = useState('');
@@ -40,8 +43,15 @@ export default function AdminProducts() {
   };
 
   useEffect(() => {
-    fetchProducts();
+    const init = async () => {
+      const r = await getAdminRole();
+      setRole(r);
+      await fetchProducts();
+    };
+    init();
   }, []);
+  
+  const isSuperAdmin = role === 'super_admin';
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
@@ -109,6 +119,44 @@ export default function AdminProducts() {
       fetchProducts();
     } catch (e) {
       console.error(e);
+    }
+  };
+
+  const handleDeleteAll = async () => {
+    if (!confirm('Are you ABSOLUTELY SURE you want to delete ALL products? This cannot be undone.')) return;
+    try {
+      for (const p of products) {
+        await deleteDoc(doc(db, 'products', p.id));
+      }
+      fetchProducts();
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const [bulkPrices, setBulkPrices] = useState<{[key: string]: string}>({});
+  const [isSavingPrices, setIsSavingPrices] = useState(false);
+
+  const handleBulkPriceChange = (id: string, price: string) => {
+    setBulkPrices(prev => ({...prev, [id]: price}));
+  };
+
+  const saveBulkPrices = async () => {
+    setIsSavingPrices(true);
+    try {
+      for (const [id, newPrice] of Object.entries(bulkPrices)) {
+        if (newPrice) {
+          await updateDoc(doc(db, 'products', id), { price: newPrice });
+        }
+      }
+      alert('Prices updated successfully!');
+      setBulkPrices({});
+      fetchProducts();
+    } catch (e) {
+      console.error(e);
+      alert('Failed to update some prices.');
+    } finally {
+      setIsSavingPrices(false);
     }
   };
 
@@ -191,7 +239,21 @@ export default function AdminProducts() {
 
         {/* Product List */}
         <div>
-          <h2 className="text-xl font-semibold mb-6">Current Catalog</h2>
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-xl font-semibold">Current Catalog</h2>
+            {isSuperAdmin && products.length > 0 && (
+              <div className="flex gap-2">
+                {Object.keys(bulkPrices).length > 0 && (
+                  <Button variant="default" size="sm" onClick={saveBulkPrices} disabled={isSavingPrices}>
+                    {isSavingPrices ? 'Saving...' : 'Save Prices'}
+                  </Button>
+                )}
+                <Button variant="destructive" size="sm" onClick={handleDeleteAll}>
+                  Delete All Products
+                </Button>
+              </div>
+            )}
+          </div>
           {isLoading ? (
             <p className="text-muted-foreground">Loading products...</p>
           ) : (
@@ -202,12 +264,25 @@ export default function AdminProducts() {
                     <img src={product.image} alt={product.name} className="w-12 h-12 rounded-md object-cover bg-muted" />
                     <div>
                       <p className="font-medium">{product.name}</p>
-                      <p className="text-sm text-muted-foreground">{product.price} • Batch {product.batch}</p>
+                      {isSuperAdmin ? (
+                        <div className="flex items-center gap-2 mt-1">
+                          <Input 
+                            value={bulkPrices[product.id] !== undefined ? bulkPrices[product.id] : product.price} 
+                            onChange={(e) => handleBulkPriceChange(product.id, e.target.value)} 
+                            className="w-24 h-8 text-xs" 
+                          />
+                          <span className="text-xs text-muted-foreground">• Batch {product.batch}</span>
+                        </div>
+                      ) : (
+                        <p className="text-sm text-muted-foreground">{product.price} • Batch {product.batch}</p>
+                      )}
                     </div>
                   </div>
-                  <Button variant="ghost" size="icon" onClick={() => handleDelete(product.id)} className="text-destructive hover:text-destructive hover:bg-destructive/10">
-                    <Trash2 className="w-5 h-5" />
-                  </Button>
+                  {isSuperAdmin && (
+                    <Button variant="ghost" size="icon" onClick={() => handleDelete(product.id)} className="text-destructive hover:text-destructive hover:bg-destructive/10">
+                      <Trash2 className="w-5 h-5" />
+                    </Button>
+                  )}
                 </div>
               ))}
               {products.length === 0 && <p className="text-muted-foreground">No products found in database.</p>}

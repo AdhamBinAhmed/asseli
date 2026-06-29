@@ -6,6 +6,7 @@ import { db } from '@/lib/firebase/config';
 import { Button } from '@/components/ui/button';
 import { Trash2, CheckCircle, XCircle, Clock } from 'lucide-react';
 import { Link } from '@/i18n/routing';
+import { getAdminRole } from '@/app/actions/auth';
 
 interface OrderItem {
   id: string;
@@ -28,6 +29,7 @@ interface Order {
 
 export default function AdminOrders() {
   const [orders, setOrders] = useState<Order[]>([]);
+  const [role, setRole] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   const fetchOrders = async () => {
@@ -48,8 +50,15 @@ export default function AdminOrders() {
   };
 
   useEffect(() => {
-    fetchOrders();
+    const init = async () => {
+      const r = await getAdminRole();
+      setRole(r);
+      await fetchOrders();
+    };
+    init();
   }, []);
+
+  const isSuperAdmin = role === 'super_admin';
 
   const updateStatus = async (id: string, newStatus: 'pending' | 'accepted' | 'refused') => {
     try {
@@ -70,6 +79,19 @@ export default function AdminOrders() {
     }
   };
 
+  const handleDeletePendingRefused = async () => {
+    if (!confirm('Are you sure you want to delete ALL pending and refused orders?')) return;
+    try {
+      const toDelete = orders.filter(o => o.status === 'pending' || o.status === 'refused');
+      for (const order of toDelete) {
+        await deleteDoc(doc(db, 'orders', order.id));
+      }
+      fetchOrders();
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
   const StatusIcon = ({ status }: { status: string }) => {
     if (status === 'accepted') return <CheckCircle className="w-5 h-5 text-emerald-500" />;
     if (status === 'refused') return <XCircle className="w-5 h-5 text-destructive" />;
@@ -80,7 +102,12 @@ export default function AdminOrders() {
     <div className="p-8 max-w-7xl mx-auto w-full">
       <div className="flex items-center justify-between mb-8">
         <h1 className="text-3xl font-bold">Manage Orders</h1>
-        <div className="flex gap-4">
+        <div className="flex gap-4 items-center">
+          {isSuperAdmin && (
+            <Button variant="destructive" onClick={handleDeletePendingRefused}>
+              Delete Pending/Refused
+            </Button>
+          )}
           <Link href="/admin/products">
             <Button variant="outline">Manage Products</Button>
           </Link>
@@ -145,9 +172,11 @@ export default function AdminOrders() {
                   Refuse
                 </Button>
                 <div className="flex-1 hidden md:block"></div>
-                <Button variant="ghost" className="text-destructive hover:bg-destructive/10 mt-auto" onClick={() => handleDelete(order.id)}>
-                  <Trash2 className="w-4 h-4 mr-2" /> Delete
-                </Button>
+                {isSuperAdmin && (
+                  <Button variant="ghost" className="text-destructive hover:bg-destructive/10 mt-auto" onClick={() => handleDelete(order.id)}>
+                    <Trash2 className="w-4 h-4 mr-2" /> Delete
+                  </Button>
+                )}
               </div>
 
             </div>
