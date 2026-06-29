@@ -327,14 +327,14 @@ export default function Home() {
       </div>
 
       {/* Parallax Background Honeycombs */}
-      <div ref={bgBerriesRef} className="absolute inset-0 pointer-events-none z-10">
+      <div ref={bgBerriesRef} className="hidden md:block absolute inset-0 pointer-events-none z-10">
         <img src="/honeycomb.png" ref={el => { if (el) particlesRef.current[6] = el }} className="absolute top-[20%] left-[40%] w-24 opacity-60 drop-shadow-2xl" alt="" />
         <img src="/honeycomb.png" ref={el => { if (el) particlesRef.current[7] = el }} className="absolute top-[50%] left-[55%] w-20 opacity-50 drop-shadow-2xl" alt="" />
         <img src="/honeycomb.png" ref={el => { if (el) particlesRef.current[8] = el }} className="absolute top-[70%] left-[30%] w-28 opacity-40 drop-shadow-2xl" alt="" />
       </div>
 
       {/* Parallax Foreground Honeycombs */}
-      <div ref={fgBerriesRef} className="absolute inset-0 pointer-events-none z-40">
+      <div ref={fgBerriesRef} className="hidden md:block absolute inset-0 pointer-events-none z-40">
         <img src="/honeycomb.png" ref={el => { if (el) particlesRef.current[0] = el }} className="absolute top-[25%] left-[25%] w-40 drop-shadow-2xl" alt="" />
         <img src="/honeycomb.png" ref={el => { if (el) particlesRef.current[1] = el }} className="absolute top-[60%] left-[42%] w-24 drop-shadow-2xl" alt="" />
         <img src="/honeycomb.png" ref={el => { if (el) particlesRef.current[2] = el }} className="absolute top-[30%] left-[62%] w-48 drop-shadow-2xl" alt="" />
