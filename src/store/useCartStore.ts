@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 
 export interface Product {
   id: string;
@@ -24,8 +25,10 @@ interface CartStore {
   setShowPopup: (show: boolean, product?: Product) => void;
 }
 
-export const useCartStore = create<CartStore>((set) => ({
-  items: [],
+export const useCartStore = create<CartStore>()(
+  persist(
+    (set) => ({
+      items: [],
   showPopup: false,
   popupProduct: null,
   addItem: (product) => {
@@ -66,4 +69,10 @@ export const useCartStore = create<CartStore>((set) => ({
   },
   clearCart: () => set({ items: [] }),
   setShowPopup: (show, product) => set({ showPopup: show, ...(product ? { popupProduct: product } : {}) }),
-}));
+    }),
+    {
+      name: 'cart-storage',
+      partialize: (state) => ({ items: state.items }), // Only persist the cart items, not the popup state
+    }
+  )
+);
