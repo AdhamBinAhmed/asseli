@@ -56,7 +56,7 @@ export function Navbar() {
         </div>
 
         {/* Desktop Nav */}
-        <nav className="hidden md:flex items-center gap-6 text-[15px] font-medium text-muted-foreground">
+        <nav className="hidden md:flex items-center gap-6 text-lg font-medium text-muted-foreground">
           <Link href="/" className="transition-colors hover:text-foreground">{t('home')}</Link>
           <Link href="/products" className="transition-colors hover:text-foreground">{t('shop')}</Link>
           <Link href="/lab-analysis" className="transition-colors hover:text-foreground">{t('provenance')}</Link>
