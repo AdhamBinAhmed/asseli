@@ -51,7 +51,7 @@ export function Navbar() {
         {/* Logo */}
         <div className="flex items-center gap-2">
           <Link href="/" className="flex items-center space-x-2">
-            <img src="/logo.png" alt="Asseli" className="h-10 w-auto object-contain" />
+            <img src="/logo.png" alt="Asseli" className="h-20 w-auto object-contain" />
           </Link>
         </div>
 
@@ -103,7 +103,7 @@ export function Navbar() {
         className={`fixed top-0 bottom-0 z-50 w-[75%] max-w-sm bg-white/95 backdrop-blur-xl text-black shadow-2xl transition-transform duration-300 ease-out md:hidden flex flex-col ${locale === 'ar' ? 'right-0 border-l border-black/10' : 'left-0 border-r border-black/10'} ${isMobileMenuOpen ? 'translate-x-0' : (locale === 'ar' ? 'translate-x-full' : '-translate-x-full')}`}
       >
         <div className="flex items-center justify-between p-5 border-b border-black/10">
-          <img src="/logo.png" alt="Asseli" className="h-10 w-auto object-contain" />
+          <img src="/logo.png" alt="Asseli" className="h-20 w-auto object-contain" />
           <Button variant="ghost" size="icon" className="text-black hover:bg-black/5 hover:text-black rounded-full" onClick={() => setIsMobileMenuOpen(false)}>
             <X className="h-6 w-6" />
           </Button>
