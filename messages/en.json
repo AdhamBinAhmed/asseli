@@ -63,5 +63,12 @@
     "megaDevs": "Mega Devs",
     "contact": "Contact Us",
     "whatsapp": "WhatsApp"
+  },
+  "SuccessPage": {
+    "title": "Order Placed Successfully!",
+    "thanks": "Thanks for buying from us, we will contact you soon.",
+    "orderId": "Your Order ID is:",
+    "trackOrder": "Track Your Order",
+    "backHome": "Back to Home"
   }
 }

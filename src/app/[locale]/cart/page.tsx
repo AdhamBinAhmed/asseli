@@ -86,8 +86,7 @@ export default function CartPage() {
       
       const docRef = await addDoc(collection(db, 'orders'), order);
       clearCart();
-      alert(locale === 'ar' ? `تم استلام طلبك بنجاح! رقم تتبع الطلب الخاص بك هو: ${docRef.id}` : `Your order has been received successfully! Your tracking ID is: ${docRef.id}`);
-      router.push('/track-order');
+      router.push(`/success?orderId=${docRef.id}`);
     } catch (e) {
       console.error(e);
       alert('Error placing order.');
