@@ -8,6 +8,7 @@ import { routing } from '@/i18n/routing';
 import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
 import { GlobalSettingsProvider } from '@/components/layout/GlobalSettingsProvider';
+import { CartPopup } from '@/components/ui/CartPopup';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -45,11 +46,14 @@ export default async function RootLayout({
       <body className="flex flex-col min-h-screen bg-background bg-[url('/phone-back.jpg')] md:bg-[url('/pc-back.jpg')] bg-cover bg-center bg-fixed text-foreground antialiased selection:bg-primary/20 selection:text-primary transition-colors duration-1000 ease-in-out">
         <NextIntlClientProvider messages={messages}>
           <GlobalSettingsProvider>
-            <Navbar />
-            <main className="flex-1 flex flex-col relative">
-              {children}
-            </main>
-            <Footer />
+            <div className="flex flex-col min-h-screen">
+              <Navbar />
+              <main className="flex-grow pt-16 flex flex-col">
+                {children}
+              </main>
+              <Footer />
+              <CartPopup />
+            </div>
           </GlobalSettingsProvider>
         </NextIntlClientProvider>
       </body>

@@ -19,10 +19,15 @@ interface CartStore {
   removeItem: (id: string) => void;
   updateQuantity: (id: string, quantity: number) => void;
   clearCart: () => void;
+  showPopup: boolean;
+  popupProduct: Product | null;
+  setShowPopup: (show: boolean, product?: Product) => void;
 }
 
 export const useCartStore = create<CartStore>((set) => ({
   items: [],
+  showPopup: false,
+  popupProduct: null,
   addItem: (product) => {
     set((state) => {
       const existingItem = state.items.find((item) => item.id === product.id);
@@ -33,8 +38,21 @@ export const useCartStore = create<CartStore>((set) => ({
           ),
         };
       }
-      return { items: [...state.items, { ...product, quantity: 1 }] };
+      return { 
+        items: [...state.items, { ...product, quantity: 1 }] 
+      };
     });
+    set({ showPopup: true, popupProduct: product });
+    
+    // Auto-hide popup after 3 seconds
+    setTimeout(() => {
+      set((state) => {
+        if (state.popupProduct?.id === product.id) {
+          return { showPopup: false };
+        }
+        return state;
+      });
+    }, 3000);
   },
   removeItem: (id) => {
     set((state) => ({ items: state.items.filter((item) => item.id !== id) }));
@@ -47,4 +65,5 @@ export const useCartStore = create<CartStore>((set) => ({
     }));
   },
   clearCart: () => set({ items: [] }),
+  setShowPopup: (show, product) => set({ showPopup: show, ...(product ? { popupProduct: product } : {}) }),
 }));
