@@ -119,7 +119,7 @@ export default function TrackOrderPage() {
 
               <div className="flex justify-between items-center pt-6 border-t border-border/50">
                 <span className="text-xl font-bold">{t('total')}</span>
-                <span className="text-2xl font-bold text-primary">${(order.total || 0).toFixed(2)}</span>
+                <span className="text-2xl font-bold text-primary">EGP {(order.total || 0).toFixed(2)}</span>
               </div>
             </div>
 

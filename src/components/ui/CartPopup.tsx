@@ -13,11 +13,11 @@ export function CartPopup() {
     <AnimatePresence>
       {showPopup && popupProduct && (
         <motion.div
-          initial={{ opacity: 0, y: 50, scale: 0.95 }}
+          initial={{ opacity: 0, y: -50, scale: 0.95 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
-          exit={{ opacity: 0, y: 20, scale: 0.95 }}
+          exit={{ opacity: 0, y: -20, scale: 0.95 }}
           transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-          className="fixed bottom-6 right-6 md:bottom-10 md:right-10 z-[100] max-w-sm w-[calc(100vw-3rem)] bg-card border border-border/50 shadow-2xl rounded-2xl overflow-hidden"
+          className="fixed top-20 right-6 md:top-24 md:right-10 z-[100] max-w-sm w-[calc(100vw-3rem)] bg-card border border-border/50 shadow-2xl rounded-2xl overflow-hidden"
         >
           <div className="p-4 flex flex-col gap-4">
             <div className="flex items-start justify-between gap-4">

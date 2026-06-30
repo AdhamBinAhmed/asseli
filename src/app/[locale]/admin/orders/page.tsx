@@ -155,7 +155,7 @@ export default function AdminOrders() {
                   </ul>
                   <div className="border-t border-border/50 mt-3 pt-3 flex justify-between font-bold">
                     <span>Total</span>
-                    <span>${(order.total || 0).toFixed(2)}</span>
+                    <span>EGP {(order.total || 0).toFixed(2)}</span>
                   </div>
                 </div>
               </div>

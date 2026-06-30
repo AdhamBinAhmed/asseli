@@ -188,7 +188,7 @@ export default function AdminProducts() {
           <h2 className="text-xl font-semibold mb-6">Add New Product</h2>
           <form onSubmit={handleAdd} className="flex flex-col gap-4">
             <Input placeholder="Product Name (e.g. Sidr Honey)" value={newProduct.name} onChange={e => setNewProduct({...newProduct, name: e.target.value})} required />
-            <Input placeholder="Price (e.g. $120.00)" value={newProduct.price} onChange={e => setNewProduct({...newProduct, price: e.target.value})} required />
+            <Input placeholder="Price (e.g. EGP 120.00)" value={newProduct.price} onChange={e => setNewProduct({...newProduct, price: e.target.value})} required />
             <Input placeholder="Weight (e.g. 500g)" value={newProduct.weight} onChange={e => setNewProduct({...newProduct, weight: e.target.value})} required />
             <Input placeholder="Batch Number (e.g. #002)" value={newProduct.batch} onChange={e => setNewProduct({...newProduct, batch: e.target.value})} required />
             

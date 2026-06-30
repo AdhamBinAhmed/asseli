@@ -60,7 +60,7 @@ export default function CartPage() {
   const [customerAddress, setCustomerAddress] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const parsePrice = (priceStr: string) => parseFloat(priceStr.replace('$', ''));
+  const parsePrice = (priceStr: string) => parseFloat(priceStr.replace(/[^0-9.]/g, '')) || 0;
   
   const subtotal = items.reduce((acc, item) => acc + (parsePrice(item.price) * item.quantity), 0);
   
@@ -167,7 +167,7 @@ export default function CartPage() {
             
             <div className="flex justify-between text-lg">
               <span className="text-muted-foreground">{t('subtotal')}</span>
-              <span className="font-medium">${subtotal.toFixed(2)}</span>
+              <span className="font-medium">EGP {subtotal.toFixed(2)}</span>
             </div>
             
             <div className="flex flex-col gap-4 border-y border-border/50 py-6">
@@ -194,14 +194,14 @@ export default function CartPage() {
               {selectedGov && (
                 <div className="flex justify-between text-sm font-medium mt-2">
                   <span>{t('shipping')}</span>
-                  <span>${shippingCost.toFixed(2)}</span>
+                  <span>EGP {shippingCost.toFixed(2)}</span>
                 </div>
               )}
             </div>
             
             <div className="flex justify-between text-xl font-bold mt-2">
               <span>{t('total')}</span>
-              <span>${total.toFixed(2)}</span>
+              <span>EGP {total.toFixed(2)}</span>
             </div>
             
             <Button 

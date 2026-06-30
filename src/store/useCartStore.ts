@@ -44,7 +44,7 @@ export const useCartStore = create<CartStore>((set) => ({
     });
     set({ showPopup: true, popupProduct: product });
     
-    // Auto-hide popup after 3 seconds
+    // Auto-hide popup after 5 seconds
     setTimeout(() => {
       set((state) => {
         if (state.popupProduct?.id === product.id) {
@@ -52,7 +52,7 @@ export const useCartStore = create<CartStore>((set) => ({
         }
         return state;
       });
-    }, 3000);
+    }, 5000);
   },
   removeItem: (id) => {
     set((state) => ({ items: state.items.filter((item) => item.id !== id) }));
