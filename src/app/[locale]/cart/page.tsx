@@ -125,8 +125,8 @@ export default function CartPage() {
           {items.map((item, index) => (
             <ScrollFadeIn key={item.id} delay={0.1 + index * 0.1}>
               <div className="flex flex-col sm:flex-row items-center gap-6 p-4 border border-border/50 rounded-2xl bg-card">
-                <div className="w-full sm:w-32 h-32 bg-muted rounded-xl overflow-hidden flex-shrink-0 relative">
-                  <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                <div className="w-24 h-24 md:w-32 md:h-32 bg-muted rounded-xl md:rounded-2xl overflow-hidden flex-shrink-0 border border-border/50">
+                  <img src={item.image} alt={item.name} className="w-full h-full object-contain p-2" />
                 </div>
                 
                 <div className="flex flex-col flex-1 justify-between w-full h-full py-2">

@@ -215,7 +215,7 @@ export default function AdminProducts() {
 
                 {newProduct.image ? (
                   <div className="relative w-full h-full group">
-                    <img src={newProduct.image} alt="Preview" className="w-full h-full object-cover" />
+                    <img src={newProduct.image} alt="Preview" className="w-full h-full object-contain p-2" />
                     <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                       <Button variant="secondary" size="sm" onClick={(e) => { e.stopPropagation(); setNewProduct(prev => ({...prev, image: ''})); }}>
                         Remove Image
@@ -269,7 +269,7 @@ export default function AdminProducts() {
               {products.map(product => (
                 <div key={product.id} className="flex items-center justify-between p-4 border border-border/50 rounded-xl bg-card">
                   <div className="flex items-center gap-4">
-                    <img src={product.image} alt={product.name} className="w-12 h-12 rounded-md object-cover bg-muted" />
+                    <img src={product.image} alt={product.name} className="w-12 h-12 rounded-md object-contain p-1 bg-muted" />
                     <div>
                       <p className="font-medium text-sm md:text-base">{product.name}</p>
                       {isSuperAdmin ? (

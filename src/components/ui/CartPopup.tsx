@@ -42,7 +42,7 @@ export function CartPopup() {
               <img 
                 src={popupProduct.image} 
                 alt={popupProduct.name} 
-                className="w-12 h-12 object-cover rounded-md bg-muted" 
+                className="w-12 h-12 object-contain p-1 rounded-md bg-muted" 
               />
               <Link href="/cart" className="flex-1">
                 <Button 
