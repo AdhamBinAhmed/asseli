@@ -14,7 +14,7 @@ export default function middleware(req: NextRequest) {
     const adminToken = req.cookies.get('admin_token');
     if (!adminToken) {
       const localeMatch = pathname.match(/^\/(en|ar)/);
-      const locale = localeMatch ? localeMatch[1] : 'en';
+      const locale = localeMatch ? localeMatch[1] : 'ar';
       return NextResponse.redirect(new URL(`/${locale}/admin/login`, req.url));
     }
   }
