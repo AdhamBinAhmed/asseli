@@ -6,9 +6,6 @@ import { Link } from '@/i18n/routing';
 import gsap from 'gsap';
 import { Plus } from 'lucide-react';
 import Image from 'next/image';
-import { Canvas } from '@react-three/fiber';
-import { Suspense } from 'react';
-import { HoneyJar3D } from '@/components/3d/HoneyJar3D';
 
 const FLOAT_DURATIONS = [5, 7, 6, 8, 5.5, 6.5, 9, 11, 10];
 
@@ -19,6 +16,7 @@ export default function Home() {
   const containerRef = useRef<HTMLDivElement>(null);
   const fgBerriesRef = useRef<HTMLDivElement>(null);
   const bgBerriesRef = useRef<HTMLDivElement>(null);
+  const mainProductRef = useRef<HTMLImageElement>(null);
   const particlesRef = useRef<HTMLImageElement[]>([]);
 
   const [flavor, setFlavor] = useState<'classic' | 'dark'>('classic');
@@ -64,6 +62,13 @@ export default function Home() {
 
       currentMouse.current.x += (mouse.current.x - currentMouse.current.x) * 0.05;
       currentMouse.current.y += (mouse.current.y - currentMouse.current.y) * 0.05;
+
+      // Rotate the main 2D product to look 3D
+      if (mainProductRef.current) {
+        const rotX = currentMouse.current.y * -30;
+        const rotY = currentMouse.current.x * 30 + switchSpin.current;
+        mainProductRef.current.style.transform = `translate(-50%, -50%) rotateX(${rotX}deg) rotateY(${rotY}deg) scale(1.1)`;
+      }
 
       // Parallax containers
       if (fgBerriesRef.current) fgBerriesRef.current.style.transform = `translate(${currentMouse.current.x * 60}px, ${currentMouse.current.y * 60}px)`;
@@ -183,6 +188,7 @@ export default function Home() {
       ease: "power2.in",
       onUpdate: () => {
         switchSpin.current = spinObj.val;
+        if (mainProductRef.current) mainProductRef.current.style.filter = `blur(${spinObj.blur}px)`;
       },
       onComplete: () => {
         setFlavor(newFlavor); // Instant swap image at peak blur
@@ -194,9 +200,11 @@ export default function Home() {
           ease: "back.out(0.7)",
           onUpdate: () => {
             switchSpin.current = spinObj.val;
+            if (mainProductRef.current) mainProductRef.current.style.filter = `blur(${spinObj.blur}px)`;
           },
           onComplete: () => {
             switchSpin.current = 0;
+            if (mainProductRef.current) mainProductRef.current.style.filter = 'none';
           }
         });
       }
@@ -307,15 +315,15 @@ export default function Home() {
 
       </div>
 
-      {/* Main Center Product (True 3D) */}
-      <div className="absolute inset-0 z-20 pointer-events-none flex items-center justify-center">
-        <div className="w-[156px] h-[300px] sm:w-[216px] sm:h-[400px] md:w-[420px] md:h-[600px] lg:w-[540px] lg:h-[800px] absolute top-[55%] md:top-[60%] left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-auto">
-          <Suspense fallback={<div className="w-full h-full flex items-center justify-center text-white/50 text-sm animate-pulse">Loading 3D Model...</div>}>
-            <Canvas camera={{ position: [0, 0, 5], fov: 45 }}>
-              <HoneyJar3D flavor={flavor} />
-            </Canvas>
-          </Suspense>
-        </div>
+      {/* Main Center Product (3D CSS Trick) */}
+      <div className="absolute inset-0 flex items-center justify-center z-20 pointer-events-none" style={{ perspective: '1200px' }}>
+        <img
+          ref={mainProductRef}
+          src={flavor === 'classic' ? '/honey-light.png' : '/honey-dark.png'}
+          alt="Main Honey Jar"
+          className="w-[156px] sm:w-[216px] md:w-[420px] lg:w-[540px] object-contain drop-shadow-[0_20px_50px_rgba(0,0,0,0.8)] absolute top-[48%] md:top-1/2 left-1/2"
+          style={{ transformStyle: 'preserve-3d' }}
+        />
       </div>
 
       {/* Parallax Background Honeycombs */}
