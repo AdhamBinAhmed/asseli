@@ -6,6 +6,7 @@ import { Link } from '@/i18n/routing';
 import gsap from 'gsap';
 import { Plus } from 'lucide-react';
 import Image from 'next/image';
+import HoneyJar3DScene from '@/components/3d/HoneyJar3D';
 
 const FLOAT_DURATIONS = [5, 7, 6, 8, 5.5, 6.5, 9, 11, 10];
 
@@ -315,15 +316,11 @@ export default function Home() {
 
       </div>
 
-      {/* Main Center Product (3D CSS Trick) */}
+      {/* Main Center Product (True 3D) */}
       <div className="absolute inset-0 flex items-center justify-center z-20 pointer-events-none" style={{ perspective: '1200px' }}>
-        <img
-          ref={mainProductRef}
-          src={flavor === 'classic' ? '/honey-light.png' : '/honey-dark.png'}
-          alt="Main Honey Jar"
-          className="w-[156px] sm:w-[216px] md:w-[420px] lg:w-[540px] object-contain drop-shadow-[0_20px_50px_rgba(0,0,0,0.8)] absolute top-[48%] md:top-1/2 left-1/2"
-          style={{ transformStyle: 'preserve-3d' }}
-        />
+        <div className="w-full h-full pointer-events-auto flex items-center justify-center relative mt-10 md:mt-20">
+          <HoneyJar3DScene />
+        </div>
       </div>
 
       {/* Parallax Background Honeycombs */}
