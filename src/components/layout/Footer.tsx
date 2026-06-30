@@ -25,6 +25,7 @@ const WhatsappIcon = ({ className }: { className?: string }) => (
 
 export function Footer() {
   const t = useTranslations('Footer');
+  const tNav = useTranslations('Navbar');
   const currentYear = new Date().getFullYear();
   const { phoneNumber, whatsappLink, facebookLink, instagramLink } = useGlobalSettings();
 
@@ -35,33 +36,44 @@ export function Footer() {
 
   return (
     <footer className="w-full bg-card/80 backdrop-blur-md border-t border-border/50 py-12 mt-auto relative z-10">
-      <div className="max-w-7xl mx-auto px-6 md:px-12 flex flex-col items-center justify-center gap-8 text-center">
+      <div className="max-w-7xl mx-auto px-6 md:px-12 flex flex-col items-center justify-center gap-10 text-center">
+        
+        {/* Navigation Links */}
+        <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-4 text-base md:text-lg font-medium">
+          <Link href="/" className="transition-colors text-muted-foreground hover:text-primary">{tNav('home')}</Link>
+          <Link href="/products" className="transition-colors text-muted-foreground hover:text-primary">{tNav('shop')}</Link>
+          <Link href="/lab-analysis" className="transition-colors text-muted-foreground hover:text-primary">{tNav('provenance')}</Link>
+          <Link href="/track-order" className="transition-colors text-muted-foreground hover:text-primary">{tNav('track')}</Link>
+          <Link href="/cart" className="transition-colors text-muted-foreground hover:text-primary">{tNav('cartTitle')}</Link>
+        </div>
+
+        <div className="w-48 h-px bg-border/80"></div>
         
         {/* Social Media & Contact Links */}
-        <div className="flex flex-wrap items-center justify-center gap-6">
+        <div className="flex flex-wrap items-center justify-center gap-8">
           {/* Phone */}
           <a href={`tel:${phone}`} className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors">
-            <Phone className="w-5 h-5" />
-            <span className="text-sm font-medium">{phone}</span>
+            <Phone className="w-6 h-6" />
+            <span className="text-base md:text-lg font-medium">{phone}</span>
           </a>
           
           {/* WhatsApp */}
           <a href={whatsapp} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors">
-            <WhatsappIcon className="w-5 h-5" />
-            <span className="text-sm font-medium">{t('whatsapp')}</span>
+            <WhatsappIcon className="w-6 h-6" />
+            <span className="text-base md:text-lg font-medium">{t('whatsapp')}</span>
           </a>
 
           {/* Facebook */}
           {facebook && (
             <a href={facebook} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors">
-              <FacebookIcon className="w-5 h-5" />
+              <FacebookIcon className="w-6 h-6" />
             </a>
           )}
 
           {/* Instagram */}
           {instagram && (
             <a href={instagram} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors">
-              <InstagramIcon className="w-5 h-5" />
+              <InstagramIcon className="w-6 h-6" />
             </a>
           )}
         </div>
@@ -69,7 +81,7 @@ export function Footer() {
         <div className="w-24 h-px bg-border/80"></div>
 
         {/* Copyright & Powered By */}
-        <div className="flex flex-col gap-2 items-center text-sm text-muted-foreground" dir="ltr">
+        <div className="flex flex-col gap-2 items-center text-base text-muted-foreground" dir="ltr">
           <p>All rights reserved to Asseli &copy; {currentYear}</p>
           <p>
             Powered by{' '}
@@ -77,7 +89,7 @@ export function Footer() {
               href="https://megadevs.site" 
               target="_blank" 
               rel="noopener noreferrer" 
-              className="text-primary font-bold hover:underline"
+              className="text-primary font-bold hover:underline text-lg"
             >
               Mega Devs
             </a>
