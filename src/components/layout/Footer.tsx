@@ -35,63 +35,98 @@ export function Footer() {
   const instagram = instagramLink || 'https://instagram.com';
 
   return (
-    <footer className="w-full bg-card/80 backdrop-blur-md border-t border-border/50 py-12 mt-auto relative z-10">
-      <div className="max-w-7xl mx-auto px-6 md:px-12 flex flex-col items-center justify-center gap-10 text-center">
-        
-        {/* Navigation Links */}
-        <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-4 text-base md:text-lg font-medium">
-          <Link href="/" className="transition-colors text-muted-foreground hover:text-primary">{tNav('home')}</Link>
-          <Link href="/products" className="transition-colors text-muted-foreground hover:text-primary">{tNav('shop')}</Link>
-          <Link href="/lab-analysis" className="transition-colors text-muted-foreground hover:text-primary">{tNav('provenance')}</Link>
-          <Link href="/track-order" className="transition-colors text-muted-foreground hover:text-primary">{tNav('track')}</Link>
-          <Link href="/cart" className="transition-colors text-muted-foreground hover:text-primary">{tNav('cartTitle')}</Link>
-        </div>
-
-        <div className="w-48 h-px bg-border/80"></div>
-        
-        {/* Social Media & Contact Links */}
-        <div className="flex flex-wrap items-center justify-center gap-8">
-          {/* Phone */}
-          <a href={`tel:${phone}`} className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors">
-            <Phone className="w-6 h-6" />
-            <span className="text-base md:text-lg font-medium">{phone}</span>
-          </a>
+    <footer className="w-full bg-card/80 backdrop-blur-xl border-t border-border/50 pt-16 pb-8 mt-auto relative z-10">
+      <div className="max-w-7xl mx-auto px-6 md:px-12">
+        {/* Main Footer Content */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mb-12">
           
-          {/* WhatsApp */}
-          <a href={whatsapp} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors">
-            <WhatsappIcon className="w-6 h-6" />
-            <span className="text-base md:text-lg font-medium">{t('whatsapp')}</span>
-          </a>
+          {/* Column 1: Brand Info */}
+          <div className="flex flex-col items-center md:items-start gap-6">
+            <Link href="/" className="inline-block transition-transform hover:scale-105 duration-300">
+              <img src="/logo.png" alt="Asseli Logo" className="h-24 w-auto object-contain filter drop-shadow-md" />
+            </Link>
+            <p className="text-muted-foreground text-center md:text-start text-base leading-relaxed max-w-sm">
+              Discover our premium selection of pure, artisan honey. Quality assured for the perfect taste of nature.
+            </p>
+          </div>
 
-          {/* Facebook */}
-          {facebook && (
-            <a href={facebook} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors">
-              <FacebookIcon className="w-6 h-6" />
-            </a>
-          )}
+          {/* Column 2: Quick Links */}
+          <div className="flex flex-col items-center md:items-start gap-6">
+            <h3 className="text-xl font-semibold tracking-wide text-foreground">Quick Links</h3>
+            <div className="flex flex-col gap-4 text-base font-medium">
+              <Link href="/" className="group flex items-center gap-2 text-muted-foreground hover:text-primary transition-all duration-300">
+                <span className="w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-4"></span>
+                {tNav('home')}
+              </Link>
+              <Link href="/products" className="group flex items-center gap-2 text-muted-foreground hover:text-primary transition-all duration-300">
+                <span className="w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-4"></span>
+                {tNav('shop')}
+              </Link>
+              <Link href="/lab-analysis" className="group flex items-center gap-2 text-muted-foreground hover:text-primary transition-all duration-300">
+                <span className="w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-4"></span>
+                {tNav('provenance')}
+              </Link>
+              <Link href="/track-order" className="group flex items-center gap-2 text-muted-foreground hover:text-primary transition-all duration-300">
+                <span className="w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-4"></span>
+                {tNav('track')}
+              </Link>
+              <Link href="/cart" className="group flex items-center gap-2 text-muted-foreground hover:text-primary transition-all duration-300">
+                <span className="w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-4"></span>
+                {tNav('cartTitle')}
+              </Link>
+            </div>
+          </div>
 
-          {/* Instagram */}
-          {instagram && (
-            <a href={instagram} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors">
-              <InstagramIcon className="w-6 h-6" />
-            </a>
-          )}
+          {/* Column 3: Contact & Socials */}
+          <div className="flex flex-col items-center md:items-start gap-6">
+            <h3 className="text-xl font-semibold tracking-wide text-foreground">{t('contact') || 'Contact Us'}</h3>
+            <div className="flex flex-col gap-4">
+              <a href={`tel:${phone}`} className="flex items-center gap-3 text-muted-foreground hover:text-primary transition-all duration-300 hover:translate-x-1">
+                <div className="p-2 rounded-full bg-primary/10 text-primary">
+                  <Phone className="w-5 h-5" />
+                </div>
+                <span className="text-base font-medium">{phone}</span>
+              </a>
+              <a href={whatsapp} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 text-muted-foreground hover:text-primary transition-all duration-300 hover:translate-x-1">
+                <div className="p-2 rounded-full bg-primary/10 text-primary">
+                  <WhatsappIcon className="w-5 h-5" />
+                </div>
+                <span className="text-base font-medium">{t('whatsapp')}</span>
+              </a>
+            </div>
+
+            <div className="flex items-center gap-4 mt-2">
+              {facebook && (
+                <a href={facebook} target="_blank" rel="noopener noreferrer" className="p-2.5 rounded-full bg-card shadow-sm border border-border/50 text-muted-foreground hover:text-primary hover:border-primary/50 hover:shadow-md hover:-translate-y-1 transition-all duration-300">
+                  <FacebookIcon className="w-5 h-5" />
+                </a>
+              )}
+              {instagram && (
+                <a href={instagram} target="_blank" rel="noopener noreferrer" className="p-2.5 rounded-full bg-card shadow-sm border border-border/50 text-muted-foreground hover:text-primary hover:border-primary/50 hover:shadow-md hover:-translate-y-1 transition-all duration-300">
+                  <InstagramIcon className="w-5 h-5" />
+                </a>
+              )}
+            </div>
+          </div>
         </div>
 
-        <div className="w-24 h-px bg-border/80"></div>
+        {/* Divider */}
+        <div className="w-full h-px bg-gradient-to-r from-transparent via-border to-transparent mb-8"></div>
 
-        {/* Copyright & Powered By */}
-        <div className="flex flex-col gap-2 items-center text-base text-muted-foreground" dir="ltr">
-          <p>All rights reserved to Asseli &copy; {currentYear}</p>
-          <p>
-            Powered by{' '}
+        {/* Bottom Bar */}
+        <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-sm md:text-base text-muted-foreground" dir="ltr">
+          <p className="font-medium">
+            {t('rights') || 'All rights reserved to Asseli'} &copy; {currentYear}
+          </p>
+          <p className="flex items-center gap-2">
+            {t('poweredBy') || 'Powered by'}
             <a 
               href="https://megadevs.site" 
               target="_blank" 
               rel="noopener noreferrer" 
-              className="text-primary font-bold hover:underline text-lg"
+              className="text-primary font-bold hover:text-primary/80 hover:underline transition-all duration-300"
             >
-              Mega Devs
+              {t('megaDevs') || 'Mega Devs'}
             </a>
           </p>
         </div>
