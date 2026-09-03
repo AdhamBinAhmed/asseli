@@ -128,3 +128,85 @@
     @apply font-sans;
   }
 }
+
+/* ===================== Asseli cinematic homepage ===================== */
+
+/* Slowly drifting mesh of warm light */
+@keyframes assMesh {
+  0%   { transform: translate3d(0,0,0) scale(1); }
+  33%  { transform: translate3d(3%, -2%, 0) scale(1.08); }
+  66%  { transform: translate3d(-2%, 2%, 0) scale(1.04); }
+  100% { transform: translate3d(0,0,0) scale(1); }
+}
+
+/* Organic honey-blob morph */
+@keyframes assBlob {
+  0%,100% { border-radius: 42% 58% 63% 37% / 42% 42% 58% 58%; }
+  33%     { border-radius: 68% 32% 41% 59% / 63% 51% 49% 37%; }
+  66%     { border-radius: 35% 65% 55% 45% / 55% 33% 67% 45%; }
+}
+
+/* Gentle vertical float */
+@keyframes assFloat {
+  0%,100% { transform: translateY(0) rotate(var(--r, 0deg)); }
+  50%     { transform: translateY(-22px) rotate(calc(var(--r, 0deg) + 4deg)); }
+}
+
+/* Shimmer sweep for gradient text */
+@keyframes assShimmer {
+  0%   { background-position: 0% 50%; }
+  100% { background-position: 200% 50%; }
+}
+
+/* Marquee track */
+@keyframes assMarquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+/* Halo pulse behind the jar */
+@keyframes assPulse {
+  0%,100% { opacity: .55; transform: scale(1); }
+  50%     { opacity: .85; transform: scale(1.12); }
+}
+
+/* Falling honey drip */
+@keyframes assDrip {
+  0%   { transform: translateY(-100%) scaleY(.6); opacity: 0; }
+  15%  { opacity: 1; }
+  70%  { transform: translateY(60vh) scaleY(1); opacity: 1; }
+  100% { transform: translateY(72vh) scaleY(.4); opacity: 0; }
+}
+
+.ass-mesh    { animation: assMesh 26s ease-in-out infinite; }
+.ass-blob    { animation: assBlob 14s ease-in-out infinite; }
+.ass-float   { animation: assFloat var(--d, 7s) ease-in-out infinite; }
+.ass-pulse   { animation: assPulse 5s ease-in-out infinite; }
+.ass-marquee { animation: assMarquee var(--d, 30s) linear infinite; }
+.ass-drip    { animation: assDrip var(--d, 6s) ease-in var(--delay, 0s) infinite; }
+
+.ass-shimmer {
+  background-image: linear-gradient(100deg, #b45309 0%, #fbbf24 25%, #fff4d6 45%, #fbbf24 65%, #b45309 90%);
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: assShimmer 6s linear infinite;
+}
+
+/* Film-grain texture overlay */
+.ass-grain::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: .06;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ass-mesh, .ass-blob, .ass-float, .ass-pulse, .ass-marquee, .ass-drip, .ass-shimmer {
+    animation: none !important;
+  }
+}

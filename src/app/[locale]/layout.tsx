@@ -48,7 +48,7 @@ export default async function RootLayout({
           <GlobalSettingsProvider>
             <div className="flex flex-col min-h-screen">
               <Navbar />
-              <main className="flex-grow pt-16 flex flex-col">
+              <main className="flex-grow flex flex-col">
                 {children}
               </main>
               <Footer />

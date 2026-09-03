@@ -1,348 +1,711 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
-import { useTranslations } from 'next-intl';
+import {
+  useEffect,
+  useRef,
+  useState,
+  type ReactNode,
+  type PointerEvent as ReactPointerEvent,
+} from 'react';
+import { useTranslations, useLocale } from 'next-intl';
 import { Link } from '@/i18n/routing';
-import gsap from 'gsap';
-import { Plus } from 'lucide-react';
-import Image from 'next/image';
+import {
+  motion,
+  AnimatePresence,
+  useScroll,
+  useTransform,
+  useSpring,
+  useMotionValue,
+  useInView,
+  animate,
+} from 'framer-motion';
+import { ArrowRight, Check, Droplets, Leaf, Truck, ShieldCheck } from 'lucide-react';
 
-const FLOAT_DURATIONS = [5, 7, 6, 8, 5.5, 6.5, 9, 11, 10];
+type Flavor = 'classic' | 'dark';
+
+const FLAVORS: Record<Flavor, { img: string; glow: string; accent: string }> = {
+  classic: { img: '/honey-light.png', glow: '#f59e0b', accent: '#fbbf24' },
+  dark: { img: '/honey-dark.png', glow: '#b45309', accent: '#d97706' },
+};
+
+/* =================================================================== */
+/*  Page                                                               */
+/* =================================================================== */
 
 export default function Home() {
   const t = useTranslations('HomePage');
+  const [flavor, setFlavor] = useState<Flavor>('classic');
+  const active = FLAVORS[flavor];
 
-  const bgRef = useRef<HTMLDivElement>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const fgBerriesRef = useRef<HTMLDivElement>(null);
-  const bgBerriesRef = useRef<HTMLDivElement>(null);
-  const mainProductRef = useRef<HTMLImageElement>(null);
-  const particlesRef = useRef<HTMLImageElement[]>([]);
+  return (
+    <div className="relative w-full overflow-clip bg-[#0b0705] text-[#f5e9d4]">
+      {/* Fixed cinematic backdrop for the whole page */}
+      <Backdrop glow={active.glow} />
+      <HoneyCursor />
 
-  const [flavor, setFlavor] = useState<'classic' | 'dark'>('classic');
-  const [isSwitching, setIsSwitching] = useState(false);
+      <Hero t={t} flavor={flavor} setFlavor={setFlavor} active={active} />
+      <Marquee />
+      <Featured t={t} />
+      <Quality t={t} />
+      <Why t={t} />
+      <CtaBanner t={t} />
+    </div>
+  );
+}
 
-  const mouse = useRef({ x: 0, y: 0, px: 0, py: 0 });
-  const currentMouse = useRef({ x: 0, y: 0 });
-  const switchSpin = useRef(0);
+/* =================================================================== */
+/*  Backdrop — animated warm mesh + liquid-gold goo blobs              */
+/* =================================================================== */
+
+function Backdrop({ glow }: { glow: string }) {
+  return (
+    <div aria-hidden className="pointer-events-none fixed inset-0 -z-10 overflow-hidden bg-[#0b0705]">
+      {/* Drifting light mesh */}
+      <div
+        className="ass-mesh absolute inset-[-20%]"
+        style={{
+          background: `
+            radial-gradient(40% 40% at 25% 30%, ${glow}55 0%, transparent 60%),
+            radial-gradient(45% 45% at 78% 25%, #7c2d1244 0%, transparent 60%),
+            radial-gradient(50% 50% at 60% 85%, ${glow}33 0%, transparent 65%)`,
+          transition: 'background 1.2s ease',
+        }}
+      />
+      {/* Soft ambient honey glows (blurred, no hard edges) */}
+      <svg className="absolute inset-0 h-full w-full opacity-40" preserveAspectRatio="xMidYMid slice">
+        <defs>
+          <filter id="soften" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="55" />
+          </filter>
+          <radialGradient id="gooFill" cx="50%" cy="40%" r="65%">
+            <stop offset="0%" stopColor="#fcd34d" />
+            <stop offset="100%" stopColor="#b45309" />
+          </radialGradient>
+        </defs>
+        <g filter="url(#soften)" fill="url(#gooFill)">
+          {[
+            { cx: '20%', cy: '55%', r: 60, d: 9 },
+            { cx: '85%', cy: '45%', r: 55, d: 11 },
+            { cx: '88%', cy: '80%', r: 48, d: 8 },
+            { cx: '62%', cy: '88%', r: 38, d: 10 },
+          ].map((b, i) => (
+            <circle
+              key={i}
+              cx={b.cx}
+              cy={b.cy}
+              r={b.r}
+              className="ass-float"
+              style={{ ['--d' as string]: `${b.d}s`, transformOrigin: `${b.cx} ${b.cy}` }}
+            />
+          ))}
+        </g>
+      </svg>
+      {/* Vignette */}
+      <div className="absolute inset-0 bg-[radial-gradient(120%_80%_at_50%_0%,transparent_40%,#0b0705_100%)]" />
+    </div>
+  );
+}
+
+/* =================================================================== */
+/*  Custom trailing honey cursor (desktop / fine pointer only)         */
+/* =================================================================== */
+
+function HoneyCursor() {
+  const x = useMotionValue(-100);
+  const y = useMotionValue(-100);
+  const ringX = useSpring(x, { stiffness: 220, damping: 24, mass: 0.6 });
+  const ringY = useSpring(y, { stiffness: 220, damping: 24, mass: 0.6 });
+  const [enabled, setEnabled] = useState(false);
 
   useEffect(() => {
-    // Initial Setup
-    if (bgRef.current) {
-      gsap.set(bgRef.current, {
-        '--bg-inner': '#d97706', // Amber-500
-        '--bg-mid': '#92400e', // Amber-700
-        '--bg-outer': '#451a03', // Amber-900
-        background: 'radial-gradient(circle at center, var(--bg-inner) 0%, var(--bg-mid) 50%, var(--bg-outer) 100%)'
-      });
-    }
-
-    // Initialize particle data
-    particlesRef.current.forEach((p) => {
-      if (!p) return;
-      p.dataset.rx = '0';
-      p.dataset.ry = '0';
-      p.dataset.angle = (Math.random() * 360).toString();
-      p.dataset.baseX = '0';
-      p.dataset.baseY = '0';
-    });
-
-    const handleMouseMove = (e: MouseEvent) => {
-      mouse.current.x = (e.clientX / window.innerWidth) - 0.5;
-      mouse.current.y = (e.clientY / window.innerHeight) - 0.5;
-      mouse.current.px = e.clientX;
-      mouse.current.py = e.clientY;
+    if (!window.matchMedia('(pointer: fine)').matches) return;
+    setEnabled(true);
+    const move = (e: MouseEvent) => {
+      x.set(e.clientX);
+      y.set(e.clientY);
     };
+    window.addEventListener('mousemove', move);
+    return () => window.removeEventListener('mousemove', move);
+  }, [x, y]);
 
-    window.addEventListener('mousemove', handleMouseMove);
-    let reqId: number;
+  if (!enabled) return null;
 
-    const animate = () => {
-      const time = Date.now() * 0.001;
+  return (
+    <div className="pointer-events-none fixed inset-0 z-[60] hidden md:block">
+      <motion.div
+        style={{ x: ringX, y: ringY }}
+        className="absolute left-0 top-0 -ml-16 -mt-16 h-32 w-32 rounded-full bg-[radial-gradient(circle,rgba(245,158,11,0.28),transparent_70%)] blur-md"
+      />
+      <motion.div
+        style={{ x, y }}
+        className="absolute left-0 top-0 -ml-1 -mt-1 h-2 w-2 rounded-full bg-amber-300 shadow-[0_0_12px_4px_rgba(251,191,36,0.6)]"
+      />
+    </div>
+  );
+}
 
-      currentMouse.current.x += (mouse.current.x - currentMouse.current.x) * 0.05;
-      currentMouse.current.y += (mouse.current.y - currentMouse.current.y) * 0.05;
+/* =================================================================== */
+/*  Hero                                                               */
+/* =================================================================== */
 
-      // Rotate the main 2D product to look 3D
-      if (mainProductRef.current) {
-        const rotX = currentMouse.current.y * -30;
-        const rotY = currentMouse.current.x * 30 + switchSpin.current;
-        mainProductRef.current.style.transform = `translate(-50%, -50%) rotateX(${rotX}deg) rotateY(${rotY}deg) scale(1.1)`;
-      }
+function Hero({
+  t,
+  flavor,
+  setFlavor,
+  active,
+}: {
+  t: ReturnType<typeof useTranslations>;
+  flavor: Flavor;
+  setFlavor: (f: Flavor) => void;
+  active: (typeof FLAVORS)[Flavor];
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({ target: ref, offset: ['start start', 'end start'] });
+  const jarY = useTransform(scrollYProgress, [0, 1], [0, 160]);
+  const copyY = useTransform(scrollYProgress, [0, 1], [0, -80]);
+  const fade = useTransform(scrollYProgress, [0, 0.8], [1, 0]);
 
-      // Parallax containers
-      if (fgBerriesRef.current) fgBerriesRef.current.style.transform = `translate(${currentMouse.current.x * 60}px, ${currentMouse.current.y * 60}px)`;
-      if (bgBerriesRef.current) bgBerriesRef.current.style.transform = `translate(${currentMouse.current.x * -30}px, ${currentMouse.current.y * -30}px)`;
-
-      // Particles Float and Repel
-      if (!isSwitching) {
-        particlesRef.current.forEach((particle, i) => {
-          if (!particle) return;
-          const rect = particle.getBoundingClientRect();
-          const px = rect.left + rect.width / 2;
-          const py = rect.top + rect.height / 2;
-
-          const diffX = mouse.current.px - px;
-          const diffY = mouse.current.py - py;
-          const distance = Math.sqrt(diffX * diffX + diffY * diffY);
-
-          let targetRx = 0, targetRy = 0, speedMult = 1;
-
-          if (distance < 400) {
-            const force = (400 - distance) / 400;
-            targetRx = (diffX / distance) * force * -80;
-            targetRy = (diffY / distance) * force * -80;
-            speedMult = 1 + force * 5;
-          }
-
-          let rx = parseFloat(particle.dataset.rx || '0');
-          let ry = parseFloat(particle.dataset.ry || '0');
-          let angle = parseFloat(particle.dataset.angle || '0');
-          let baseX = parseFloat(particle.dataset.baseX || '0');
-          let baseY = parseFloat(particle.dataset.baseY || '0');
-
-          rx += (targetRx - rx) * 0.1;
-          ry += (targetRy - ry) * 0.1;
-          angle += 0.2 * speedMult;
-
-          particle.dataset.rx = rx.toString();
-          particle.dataset.ry = ry.toString();
-          particle.dataset.angle = angle.toString();
-
-          const dur = FLOAT_DURATIONS[i % 9];
-          const phase = (time + i * 0.7) * (Math.PI * 2 / dur);
-          const floatY = Math.sin(phase) * 15;
-          const floatAngle = Math.cos(phase) * 6;
-
-          particle.style.transform = `translate(calc(${rx + baseX}px), calc(${ry + baseY}px + ${floatY}px)) rotate(calc(${angle}deg + ${floatAngle}deg))`;
-        });
-      }
-
-      reqId = requestAnimationFrame(animate);
-    };
-
-    reqId = requestAnimationFrame(animate);
-
-    // Bubbles Generator
-    const createBubble = () => {
-      if (!containerRef.current) return;
-      const bubble = document.createElement('div');
-      const size = Math.random() * 15 + 5 + 'px';
-      bubble.style.width = size;
-      bubble.style.height = size;
-      bubble.style.background = 'rgba(255,255,255,0.3)';
-      bubble.style.borderRadius = '50%';
-      bubble.style.position = 'absolute';
-      bubble.style.left = Math.random() * 100 + '%';
-      bubble.style.bottom = '-50px';
-      bubble.style.pointerEvents = 'none';
-      bubble.style.zIndex = '0';
-
-      const duration = Math.random() * 6 + 4;
-      bubble.animate([
-        { transform: 'translateY(0) translateX(0)', opacity: 0 },
-        { opacity: 0.6, offset: 0.1 },
-        { opacity: 0.6, offset: 0.9 },
-        { transform: 'translateY(-110vh) translateX(30px)', opacity: 0 }
-      ], {
-        duration: duration * 1000,
-        easing: 'linear',
-        fill: 'forwards'
-      });
-
-      containerRef.current.appendChild(bubble);
-      setTimeout(() => bubble.remove(), duration * 1000);
-    };
-
-    const bubbleInterval = setInterval(createBubble, 400);
-
-    return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
-      cancelAnimationFrame(reqId);
-      clearInterval(bubbleInterval);
-    };
-  }, [isSwitching]);
-
-  const switchTheme = (newFlavor: 'classic' | 'dark') => {
-    if (isSwitching || newFlavor === flavor) return;
-    setIsSwitching(true);
-
-    const targetColors = newFlavor === 'dark' ?
-      { inner: '#451a03', mid: '#1c1917', outer: '#0a0a0a' } : // Dark theme
-      { inner: '#d97706', mid: '#92400e', outer: '#451a03' };  // Classic theme
-
-    gsap.to(bgRef.current, {
-      '--bg-inner': targetColors.inner,
-      '--bg-mid': targetColors.mid,
-      '--bg-outer': targetColors.outer,
-      duration: 1.5,
-      ease: 'power2.inOut'
-    });
-
-    // Spin main product
-    const spinObj = { val: 0, blur: 0 };
-    gsap.to(spinObj, {
-      val: 360,
-      blur: 15,
-      duration: 0.6,
-      ease: "power2.in",
-      onUpdate: () => {
-        switchSpin.current = spinObj.val;
-        if (mainProductRef.current) mainProductRef.current.style.filter = `blur(${spinObj.blur}px)`;
-      },
-      onComplete: () => {
-        setFlavor(newFlavor); // Instant swap image at peak blur
-
-        gsap.to(spinObj, {
-          val: 720,
-          blur: 0,
-          duration: 1.5,
-          ease: "back.out(0.7)",
-          onUpdate: () => {
-            switchSpin.current = spinObj.val;
-            if (mainProductRef.current) mainProductRef.current.style.filter = `blur(${spinObj.blur}px)`;
-          },
-          onComplete: () => {
-            switchSpin.current = 0;
-            if (mainProductRef.current) mainProductRef.current.style.filter = 'none';
-          }
-        });
-      }
-    });
-
-    // Implode / Explode particles
-    let completed = 0;
-    particlesRef.current.forEach((particle, i) => {
-      if (!particle) return;
-      const bW = particle.offsetWidth / 2;
-      const bH = particle.offsetHeight / 2;
-      const centerX = (window.innerWidth / 2 - particle.offsetLeft - bW);
-      const centerY = (window.innerHeight / 2 - particle.offsetTop - bH);
-
-      const startAngle = parseFloat(particle.dataset.angle || '0');
-      const currentBaseX = parseFloat(particle.dataset.baseX || '0');
-      const currentBaseY = parseFloat(particle.dataset.baseY || '0');
-
-      const nextBaseX = (Math.random() - 0.5) * 300;
-      const nextBaseY = (Math.random() - 0.5) * 300;
-
-      gsap.set(particle, { rotation: startAngle, x: currentBaseX, y: currentBaseY });
-
-      const tl = gsap.timeline();
-      tl.to(particle, {
-        x: centerX, y: centerY, rotation: startAngle + 45, scale: 0.1, opacity: 0,
-        duration: 0.5, ease: "power2.in"
-      })
-        .to(particle, { duration: 0.3 })
-        .to(particle, {
-          x: nextBaseX, y: nextBaseY, rotation: startAngle + 90, scale: 1, opacity: 1,
-          duration: 0.9, ease: "back.out(1.5)",
-          onComplete: () => {
-            particle.dataset.angle = (startAngle + 90).toString();
-            particle.dataset.baseX = nextBaseX.toString();
-            particle.dataset.baseY = nextBaseY.toString();
-            particle.dataset.rx = '0';
-            particle.dataset.ry = '0';
-
-            completed++;
-            if (completed === particlesRef.current.length) {
-              setIsSwitching(false);
-            }
-          }
-        });
-    });
+  // 3D tilt driven by pointer
+  const tiltX = useSpring(useMotionValue(0), { stiffness: 150, damping: 18 });
+  const tiltY = useSpring(useMotionValue(0), { stiffness: 150, damping: 18 });
+  const onJarMove = (e: ReactPointerEvent) => {
+    const r = (e.currentTarget as HTMLElement).getBoundingClientRect();
+    const px = (e.clientX - r.left) / r.width - 0.5;
+    const py = (e.clientY - r.top) / r.height - 0.5;
+    tiltX.set(py * -22);
+    tiltY.set(px * 28);
+  };
+  const onJarLeave = () => {
+    tiltX.set(0);
+    tiltY.set(0);
   };
 
   return (
-    <div className="relative h-[calc(100vh-4rem)] w-full overflow-y-auto overflow-x-hidden md:overflow-hidden text-white flex items-center justify-center -mt-1" ref={containerRef}>
-
-      {/* Dynamic Background */}
-      <div ref={bgRef} className="fixed inset-0 -z-50 transition-all pointer-events-none" />
-
-      <div className="flex flex-col md:flex-row justify-between items-center md:items-stretch w-full h-full max-w-screen-2xl px-4 md:px-8 z-10 relative pointer-events-none">
-
-        {/* Left Column */}
-        <div className="flex flex-col justify-start md:justify-center h-auto md:h-full w-full md:w-1/3 gap-3 md:gap-6 pointer-events-auto z-50 pt-8 md:pt-0">
-          <h1 className="text-5xl md:text-6xl lg:text-8xl font-bold tracking-tight leading-[1.1] rtl:leading-[1.4] drop-shadow-xl" style={{ fontFamily: 'var(--font-geist-sans)' }}>
-            <span className="text-white/90 drop-shadow-lg text-stroke">{t('headingLine1')}</span><br />
-            {t('headingLine2')}
-          </h1>
-          <p className="hidden sm:block text-base md:text-lg text-white/90 max-w-sm drop-shadow-md">
-            {t('description')}
-          </p>
-          <div className="mt-1 md:mt-4">
-            <Link href="/lab-analysis">
-              <button className="flex items-center gap-4 bg-black/50 hover:bg-black/80 text-white rounded-full px-2 py-2 pr-6 font-bold transition-all shadow-xl backdrop-blur-md">
-                <span className="bg-amber-400 text-black w-10 h-10 rounded-full flex items-center justify-center"><Plus /></span>
-                {t('cta')}
-              </button>
-            </Link>
-          </div>
-
-          <div className="hidden md:flex items-center gap-4 mt-auto pb-8">
-            <div className="w-12 h-12 rounded-xl bg-black/20 backdrop-blur-md border border-white/20 flex items-center justify-center shadow-lg">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" className="text-amber-400"><path d="M12 15L15 18L19 14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /><path d="M7 10L12 15L17 10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
-            </div>
-            <div className="flex flex-col drop-shadow-md">
-              <span className="text-[10px] tracking-widest text-white/80 uppercase">{t('qualityAssured')}</span>
-              <span className="text-sm font-bold uppercase">{t('pureHoney')}</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Right Column (Carousel) */}
-        <div className="flex flex-col justify-end md:justify-center items-center md:items-end text-center md:text-right h-auto md:h-full w-full md:w-1/3 z-50 pointer-events-auto pb-20 md:pb-0 mt-auto md:mt-0">
-          <div className="flex flex-col gap-4 md:gap-6 items-center md:items-end pb-2 md:pb-8">
-            <div className="flex gap-4 md:gap-4">
-              <div onClick={() => switchTheme('classic')} className={`cursor-pointer bg-black/20 backdrop-blur-md border ${flavor === 'classic' ? 'border-amber-400 border-2' : 'border-white/20 hover:bg-black/40'} p-2 md:p-4 pt-16 md:pt-16 rounded-2xl md:rounded-3xl flex flex-col items-center w-24 sm:w-28 md:w-32 transition-all relative shadow-xl`}>
-                <img src="/honey-light.png" alt={t('classicAmber')} className="absolute -top-16 md:-top-10 drop-shadow-2xl pointer-events-none object-contain w-[120px] md:w-[80px] h-[120px] md:h-[80px]" />
-                <span className="font-bold text-[11px] sm:text-xs md:text-sm mt-2 md:mt-2 text-center leading-tight">{t('classicAmber')}</span>
-                <span className="text-[9px] sm:text-[10px] md:text-xs text-white/70 text-center">{t('rawHoney')}</span>
-              </div>
-              <div onClick={() => switchTheme('dark')} className={`cursor-pointer bg-black/20 backdrop-blur-md border ${flavor === 'dark' ? 'border-amber-400 border-2' : 'border-white/20 hover:bg-black/40'} p-2 md:p-4 pt-16 md:pt-16 rounded-2xl md:rounded-3xl flex flex-col items-center w-24 sm:w-28 md:w-32 transition-all relative shadow-xl`}>
-                <img src="/honey-dark.png" alt={t('darkForest')} className="absolute -top-20 md:-top-12 drop-shadow-2xl pointer-events-none object-contain w-[120px] md:w-[80px] h-[120px] md:h-[80px]" />
-                <span className="font-bold text-[11px] sm:text-xs md:text-sm mt-3 md:mt-2 text-center leading-tight">{t('darkForest')}</span>
-                <span className="text-[9px] sm:text-[10px] md:text-xs text-white/70 text-center">{t('premiumBlend')}</span>
-              </div>
-            </div>
-
-            <h2 className="hidden md:block text-5xl md:text-6xl font-bold tracking-tight mt-8 drop-shadow-xl leading-[1.1] rtl:leading-[1.4]" style={{ fontFamily: 'var(--font-geist-sans)' }}>
-              <span className="text-white/90">{t('subheadingLine1')}</span><br />
-              {t('subheadingLine2')}
-            </h2>
-          </div>
-        </div>
-
-      </div>
-
-      {/* Main Center Product (3D CSS Trick) */}
-      <div className="absolute inset-0 flex items-center justify-center z-20 pointer-events-none" style={{ perspective: '1200px' }}>
-        <img
-          ref={mainProductRef}
-          src={flavor === 'classic' ? '/honey-light.png' : '/honey-dark.png'}
-          alt="Main Honey Jar"
-          className="w-[80px] sm:w-[120px] md:w-[180px] lg:w-[220px] object-contain drop-shadow-[0_20px_50px_rgba(0,0,0,0.8)] absolute top-[48%] md:top-1/2 left-1/2"
-          style={{ transformStyle: 'preserve-3d' }}
+    <section
+      ref={ref}
+      className="ass-grain relative flex min-h-[calc(100vh-4rem)] items-center overflow-hidden"
+    >
+      {/* Honey drips from top */}
+      {[15, 42, 68, 85].map((left, i) => (
+        <span
+          key={left}
+          className="ass-drip absolute top-0 z-0 w-[3px] rounded-full bg-gradient-to-b from-transparent via-amber-400/70 to-amber-500"
+          style={{ left: `${left}%`, height: '120px', ['--d' as string]: `${5 + i}s`, ['--delay' as string]: `${i * 1.3}s` }}
         />
+      ))}
+
+      {/* Rotated editorial side label */}
+      <span className="absolute left-4 top-1/2 hidden -translate-y-1/2 -rotate-90 text-[10px] font-semibold uppercase tracking-[0.5em] text-amber-200/40 lg:block rtl:right-4 rtl:left-auto">
+        Asseli · Est. Cairo
+      </span>
+
+      <div className="mx-auto grid w-full max-w-screen-2xl grid-cols-1 items-center gap-10 px-6 py-20 md:grid-cols-12 md:px-12">
+        {/* Copy */}
+        <motion.div style={{ y: copyY }} className="order-2 md:order-1 md:col-span-6 lg:col-span-5">
+          <FadeIn delay={0.1}>
+            <span className="inline-flex items-center gap-2 rounded-full border border-amber-300/25 bg-white/5 px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-amber-200 backdrop-blur-md">
+              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-amber-400" />
+              {t('badge')}
+            </span>
+          </FadeIn>
+
+          <h1 className="mt-6 text-6xl font-bold leading-[0.9] tracking-tight rtl:leading-[1.1] sm:text-7xl lg:text-8xl">
+            <KineticLine text={t('headingLine1')} />
+            <span className="ass-shimmer block">
+              <KineticLine text={t('headingLine2')} delay={0.25} />
+            </span>
+          </h1>
+
+          <FadeIn delay={0.5}>
+            <p className="mt-7 max-w-md text-lg leading-relaxed text-amber-100/70">{t('description')}</p>
+          </FadeIn>
+
+          <FadeIn delay={0.65}>
+            <div className="mt-9 flex flex-wrap items-center gap-4">
+              <Magnetic>
+                <Link
+                  href="/products"
+                  className="group inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-amber-400 to-amber-600 px-8 py-4 font-semibold text-[#2a1608] shadow-[0_10px_40px_-8px_rgba(245,158,11,0.6)] transition-all hover:shadow-[0_14px_48px_-6px_rgba(245,158,11,0.85)]"
+                >
+                  {t('ctaPrimary')}
+                  <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1 rtl:rotate-180 rtl:group-hover:-translate-x-1" />
+                </Link>
+              </Magnetic>
+              <Magnetic>
+                <Link
+                  href="/lab-analysis"
+                  className="inline-flex items-center gap-2 rounded-full border border-amber-200/25 px-8 py-4 font-semibold text-amber-50 backdrop-blur-md transition-colors hover:bg-white/5"
+                >
+                  <ShieldCheck className="h-4 w-4 text-amber-400" />
+                  {t('ctaSecondary')}
+                </Link>
+              </Magnetic>
+            </div>
+          </FadeIn>
+
+          <FadeIn delay={0.8}>
+            <dl className="mt-12 grid max-w-md grid-cols-3 gap-4 border-t border-amber-200/15 pt-6">
+              {[
+                { v: t('statPureValue'), l: t('statPureLabel') },
+                { v: t('statLabValue'), l: t('statLabLabel') },
+                { v: t('statLocalValue'), l: t('statLocalLabel') },
+              ].map((s) => (
+                <div key={s.l}>
+                  <dt className="text-2xl font-bold text-amber-50">{s.v}</dt>
+                  <dd className="mt-1 text-xs leading-snug text-amber-100/50">{s.l}</dd>
+                </div>
+              ))}
+            </dl>
+          </FadeIn>
+        </motion.div>
+
+        {/* Jar */}
+        <div className="order-1 md:order-2 md:col-span-6 lg:col-span-7">
+          <motion.div
+            style={{ y: jarY, opacity: fade }}
+            className="relative flex h-[340px] items-center justify-center sm:h-[460px] lg:h-[600px]"
+            onPointerMove={onJarMove}
+            onPointerLeave={onJarLeave}
+          >
+            {/* Morphing halo */}
+            <div
+              className="ass-blob ass-pulse absolute h-72 w-72 blur-3xl sm:h-96 sm:w-96"
+              style={{ background: `${active.glow}66`, transition: 'background 1.2s ease' }}
+            />
+            {/* Rotating ring */}
+            <motion.div
+              className="absolute h-[300px] w-[300px] rounded-full border border-amber-300/15 sm:h-[420px] sm:w-[420px]"
+              animate={{ rotate: 360 }}
+              transition={{ duration: 40, ease: 'linear', repeat: Infinity }}
+            >
+              <span className="absolute -top-1 left-1/2 h-2 w-2 -translate-x-1/2 rounded-full bg-amber-300 shadow-[0_0_10px_2px_rgba(251,191,36,0.7)]" />
+            </motion.div>
+
+            <div style={{ perspective: 1200 }} className="relative">
+              <AnimatePresence mode="wait">
+                <motion.img
+                  key={flavor}
+                  src={active.img}
+                  alt={flavor === 'classic' ? t('classicAmber') : t('darkForest')}
+                  style={{ rotateX: tiltX, rotateY: tiltY, transformStyle: 'preserve-3d' }}
+                  initial={{ opacity: 0, scale: 0.8, filter: 'blur(12px)' }}
+                  animate={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
+                  exit={{ opacity: 0, scale: 0.8, filter: 'blur(12px)' }}
+                  transition={{ type: 'spring', stiffness: 90, damping: 15 }}
+                  className="relative h-[300px] w-auto object-contain drop-shadow-[0_40px_60px_rgba(0,0,0,0.6)] sm:h-[400px] lg:h-[520px]"
+                  draggable={false}
+                />
+              </AnimatePresence>
+            </div>
+          </motion.div>
+
+          {/* Flavor switcher */}
+          <FadeIn delay={0.4}>
+            <div className="mx-auto mt-4 max-w-sm">
+              <p className="mb-3 text-center text-[11px] font-semibold uppercase tracking-[0.18em] text-amber-100/50">
+                {t('chooseFlavor')}
+              </p>
+              <div className="grid grid-cols-2 gap-3">
+                {(
+                  [
+                    { key: 'classic', title: t('classicAmber'), sub: t('rawHoney') },
+                    { key: 'dark', title: t('darkForest'), sub: t('premiumBlend') },
+                  ] as const
+                ).map((f) => {
+                  const isActive = flavor === f.key;
+                  return (
+                    <button
+                      key={f.key}
+                      onClick={() => setFlavor(f.key)}
+                      className={`flex flex-col items-start rounded-2xl border p-4 text-start backdrop-blur-md transition-all ${
+                        isActive
+                          ? 'border-amber-400/70 bg-amber-400/10 shadow-[0_8px_30px_-10px_rgba(245,158,11,0.6)]'
+                          : 'border-white/10 bg-white/[0.03] hover:border-amber-300/40 hover:bg-white/5'
+                      }`}
+                    >
+                      <span className="flex items-center gap-2 font-semibold text-amber-50">
+                        <span className="h-2.5 w-2.5 rounded-full" style={{ background: FLAVORS[f.key].accent }} />
+                        {f.title}
+                      </span>
+                      <span className="mt-1 text-xs text-amber-100/50">{f.sub}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          </FadeIn>
+        </div>
       </div>
 
-      {/* Parallax Background Honeycombs */}
-      <div ref={bgBerriesRef} className="hidden md:block absolute inset-0 pointer-events-none z-10">
-        <img src="/honeycomb.png" ref={el => { if (el) particlesRef.current[6] = el }} className="absolute top-[20%] left-[40%] w-24 opacity-60 drop-shadow-2xl" alt="" />
-        <img src="/honeycomb.png" ref={el => { if (el) particlesRef.current[7] = el }} className="absolute top-[50%] left-[55%] w-20 opacity-50 drop-shadow-2xl" alt="" />
-        <img src="/honeycomb.png" ref={el => { if (el) particlesRef.current[8] = el }} className="absolute top-[70%] left-[30%] w-28 opacity-40 drop-shadow-2xl" alt="" />
-      </div>
+      {/* Scroll cue */}
+      <motion.div
+        style={{ opacity: fade }}
+        className="absolute bottom-6 left-1/2 -translate-x-1/2 text-amber-100/40"
+        animate={{ y: [0, 8, 0] }}
+        transition={{ duration: 1.8, repeat: Infinity }}
+      >
+        <div className="flex h-9 w-5 items-start justify-center rounded-full border border-amber-200/30 p-1">
+          <span className="h-1.5 w-1 rounded-full bg-amber-300" />
+        </div>
+      </motion.div>
+    </section>
+  );
+}
 
-      {/* Parallax Foreground Honeycombs */}
-      <div ref={fgBerriesRef} className="hidden md:block absolute inset-0 pointer-events-none z-40">
-        <img src="/honeycomb.png" ref={el => { if (el) particlesRef.current[0] = el }} className="absolute top-[25%] left-[25%] w-40 drop-shadow-2xl" alt="" />
-        <img src="/honeycomb.png" ref={el => { if (el) particlesRef.current[1] = el }} className="absolute top-[60%] left-[42%] w-24 drop-shadow-2xl" alt="" />
-        <img src="/honeycomb.png" ref={el => { if (el) particlesRef.current[2] = el }} className="absolute top-[30%] left-[62%] w-48 drop-shadow-2xl" alt="" />
-        <img src="/honeycomb.png" ref={el => { if (el) particlesRef.current[3] = el }} className="absolute top-[15%] left-[55%] w-32 drop-shadow-2xl" alt="" />
-        <img src="/honeycomb.png" ref={el => { if (el) particlesRef.current[4] = el }} className="absolute top-[75%] left-[20%] w-28 drop-shadow-2xl" alt="" />
-        <img src="/honeycomb.png" ref={el => { if (el) particlesRef.current[5] = el }} className="absolute top-[45%] left-[75%] w-36 drop-shadow-2xl" alt="" />
-      </div>
+/* =================================================================== */
+/*  Marquee band                                                       */
+/* =================================================================== */
 
+function Marquee() {
+  const words = ['RAW', 'UNFILTERED', 'LAB-VERIFIED', 'SINGLE ORIGIN', 'COLD-EXTRACTED', 'CAIRO'];
+  const row = [...words, ...words];
+  return (
+    <div className="relative flex overflow-hidden border-y border-amber-200/10 bg-black/30 py-5 backdrop-blur-sm">
+      <div className="ass-marquee flex shrink-0 items-center gap-8 whitespace-nowrap pe-8" style={{ ['--d' as string]: '32s' }}>
+        {row.map((w, i) => (
+          <span key={i} className="flex items-center gap-8 text-2xl font-bold tracking-tight text-amber-100/25 sm:text-3xl">
+            {w}
+            <span className="text-amber-400/60">✦</span>
+          </span>
+        ))}
+      </div>
+      <div className="ass-marquee flex shrink-0 items-center gap-8 whitespace-nowrap pe-8" style={{ ['--d' as string]: '32s' }} aria-hidden>
+        {row.map((w, i) => (
+          <span key={i} className="flex items-center gap-8 text-2xl font-bold tracking-tight text-amber-100/25 sm:text-3xl">
+            {w}
+            <span className="text-amber-400/60">✦</span>
+          </span>
+        ))}
+      </div>
     </div>
   );
+}
+
+/* =================================================================== */
+/*  Featured                                                           */
+/* =================================================================== */
+
+function Featured({ t }: { t: ReturnType<typeof useTranslations> }) {
+  return (
+    <Section>
+      <Header kicker={t('featuredKicker')} title={t('featuredTitle')} desc={t('featuredDesc')} />
+      <div className="mt-14 grid grid-cols-1 gap-6 md:grid-cols-2">
+        {(
+          [
+            { key: 'classic', title: t('classicAmber'), sub: t('rawHoney') },
+            { key: 'dark', title: t('darkForest'), sub: t('premiumBlend') },
+          ] as const
+        ).map((f, i) => (
+          <Reveal key={f.key} delay={i * 0.1}>
+            <Link
+              href="/products"
+              className="group relative flex flex-col items-center overflow-hidden rounded-[2rem] border border-white/10 bg-white/[0.03] p-10 backdrop-blur-md transition-all hover:-translate-y-1.5 hover:border-amber-300/40"
+            >
+              <div
+                aria-hidden
+                className="absolute inset-x-0 top-0 h-52 opacity-60 blur-3xl transition-opacity group-hover:opacity-100"
+                style={{ background: `radial-gradient(50% 100% at 50% 0%, ${FLAVORS[f.key].glow}55, transparent)` }}
+              />
+              <img
+                src={FLAVORS[f.key].img}
+                alt={f.title}
+                className="relative h-64 w-auto object-contain drop-shadow-[0_25px_45px_rgba(0,0,0,0.55)] transition-transform duration-700 group-hover:-translate-y-2 group-hover:scale-105"
+                draggable={false}
+              />
+              <div className="relative mt-8 flex w-full items-end justify-between">
+                <div>
+                  <h3 className="text-2xl font-bold text-amber-50">{f.title}</h3>
+                  <p className="text-sm text-amber-100/50">{f.sub}</p>
+                </div>
+                <span className="inline-flex items-center gap-1 text-sm font-semibold text-amber-300">
+                  {t('featuredView')}
+                  <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1 rtl:rotate-180 rtl:group-hover:-translate-x-1" />
+                </span>
+              </div>
+            </Link>
+          </Reveal>
+        ))}
+      </div>
+    </Section>
+  );
+}
+
+/* =================================================================== */
+/*  Quality (with animated counters)                                   */
+/* =================================================================== */
+
+function Quality({ t }: { t: ReturnType<typeof useTranslations> }) {
+  return (
+    <Section className="border-y border-amber-200/10 bg-black/20">
+      <div className="grid grid-cols-1 items-center gap-14 md:grid-cols-2">
+        <Reveal>
+          <div className="relative flex items-center justify-center">
+            <div className="ass-blob absolute h-72 w-72 bg-amber-500/20 blur-3xl" />
+            <div className="relative grid grid-cols-2 gap-4">
+              {[
+                { n: 100, s: '%', l: t('qualityPoint1') },
+                { n: 0, s: '', l: t('qualityPoint2') },
+                { n: 3, s: 'rd', l: t('statLabLabel') },
+                { n: 1, s: '', l: t('why2Title') },
+              ].map((c, i) => (
+                <div
+                  key={i}
+                  className="rounded-3xl border border-white/10 bg-white/[0.04] p-6 backdrop-blur-md"
+                >
+                  <div className="text-4xl font-bold text-amber-300">
+                    <Counter to={c.n} />
+                    {c.s}
+                  </div>
+                  <p className="mt-2 text-xs leading-snug text-amber-100/55">{c.l}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </Reveal>
+
+        <Reveal delay={0.1}>
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-amber-400">{t('qualityKicker')}</p>
+            <h2 className="mt-3 text-3xl font-bold leading-tight text-amber-50 sm:text-4xl">{t('qualityTitle')}</h2>
+            <p className="mt-4 max-w-md text-amber-100/60">{t('qualityDesc')}</p>
+            <ul className="mt-6 space-y-3">
+              {[t('qualityPoint1'), t('qualityPoint2'), t('qualityPoint3')].map((p) => (
+                <li key={p} className="flex items-center gap-3">
+                  <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-amber-400/15 text-amber-300">
+                    <Check className="h-3.5 w-3.5" />
+                  </span>
+                  <span className="text-sm font-medium text-amber-50/90">{p}</span>
+                </li>
+              ))}
+            </ul>
+            <Magnetic>
+              <Link
+                href="/lab-analysis"
+                className="group mt-8 inline-flex items-center gap-2 rounded-full border border-amber-300/40 px-7 py-3 font-semibold text-amber-200 transition-colors hover:bg-amber-400 hover:text-[#2a1608]"
+              >
+                {t('qualityCta')}
+                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1 rtl:rotate-180 rtl:group-hover:-translate-x-1" />
+              </Link>
+            </Magnetic>
+          </div>
+        </Reveal>
+      </div>
+    </Section>
+  );
+}
+
+/* =================================================================== */
+/*  Why                                                                */
+/* =================================================================== */
+
+function Why({ t }: { t: ReturnType<typeof useTranslations> }) {
+  const items = [
+    { icon: Droplets, title: t('why1Title'), desc: t('why1Desc') },
+    { icon: Leaf, title: t('why2Title'), desc: t('why2Desc') },
+    { icon: Truck, title: t('why3Title'), desc: t('why3Desc') },
+  ];
+  return (
+    <Section>
+      <Header title={t('whyTitle')} center />
+      <div className="mt-14 grid grid-cols-1 gap-6 sm:grid-cols-3">
+        {items.map((f, i) => (
+          <Reveal key={f.title} delay={i * 0.1}>
+            <div className="group h-full rounded-[2rem] border border-white/10 bg-white/[0.03] p-8 backdrop-blur-md transition-colors hover:border-amber-300/40">
+              <span className="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-amber-400/15 text-amber-300 transition-transform group-hover:scale-110">
+                <f.icon className="h-7 w-7" />
+              </span>
+              <h3 className="mt-6 text-lg font-bold text-amber-50">{f.title}</h3>
+              <p className="mt-2 text-sm leading-relaxed text-amber-100/55">{f.desc}</p>
+            </div>
+          </Reveal>
+        ))}
+      </div>
+    </Section>
+  );
+}
+
+/* =================================================================== */
+/*  CTA banner                                                         */
+/* =================================================================== */
+
+function CtaBanner({ t }: { t: ReturnType<typeof useTranslations> }) {
+  return (
+    <Section>
+      <Reveal>
+        <div className="ass-grain relative overflow-hidden rounded-[2.5rem] border border-amber-300/20 bg-gradient-to-br from-amber-400 via-amber-500 to-amber-700 px-8 py-16 text-center shadow-[0_30px_80px_-20px_rgba(245,158,11,0.5)] sm:px-16">
+          <div
+            aria-hidden
+            className="ass-blob absolute -left-10 -top-10 h-56 w-56 bg-white/25 blur-2xl"
+          />
+          <h2 className="relative mx-auto max-w-2xl text-3xl font-bold text-[#2a1608] sm:text-5xl">
+            {t('ctaBannerTitle')}
+          </h2>
+          <p className="relative mx-auto mt-4 max-w-lg text-[#42230c]/80">{t('ctaBannerDesc')}</p>
+          <Magnetic>
+            <Link
+              href="/products"
+              className="group relative mt-9 inline-flex items-center gap-2 rounded-full bg-[#1a0f06] px-9 py-4 font-semibold text-amber-100 transition-transform hover:scale-105"
+            >
+              {t('ctaBannerButton')}
+              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1 rtl:rotate-180 rtl:group-hover:-translate-x-1" />
+            </Link>
+          </Magnetic>
+        </div>
+      </Reveal>
+    </Section>
+  );
+}
+
+/* =================================================================== */
+/*  Reusable building blocks                                           */
+/* =================================================================== */
+
+function Section({ children, className = '' }: { children: ReactNode; className?: string }) {
+  return (
+    <section className={`relative py-24 md:py-32 ${className}`}>
+      <div className="mx-auto max-w-screen-xl px-6 md:px-12">{children}</div>
+    </section>
+  );
+}
+
+function Header({
+  kicker,
+  title,
+  desc,
+  center = false,
+}: {
+  kicker?: string;
+  title: string;
+  desc?: string;
+  center?: boolean;
+}) {
+  return (
+    <Reveal>
+      <div className={center ? 'text-center' : 'max-w-2xl'}>
+        {kicker && <p className="text-xs font-semibold uppercase tracking-[0.22em] text-amber-400">{kicker}</p>}
+        <h2 className="mt-3 text-3xl font-bold leading-tight text-amber-50 sm:text-4xl lg:text-5xl">{title}</h2>
+        {desc && <p className={`mt-4 text-amber-100/60 ${center ? 'mx-auto max-w-xl' : 'max-w-md'}`}>{desc}</p>}
+      </div>
+    </Reveal>
+  );
+}
+
+/** Simple fade-up on mount */
+function FadeIn({ children, delay = 0 }: { children: ReactNode; delay?: number }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 24 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.7, delay, ease: [0.22, 1, 0.36, 1] }}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
+/** Fade-up when scrolled into view */
+function Reveal({ children, delay = 0 }: { children: ReactNode; delay?: number }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 40 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.25 }}
+      transition={{ duration: 0.7, delay, ease: [0.22, 1, 0.36, 1] }}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
+/**
+ * Kinetic reveal of a line.
+ * English: animates character-by-character.
+ * Arabic (RTL): letters are cursive/connected, so splitting them breaks the
+ * word — animate the whole line as one unit instead.
+ */
+function KineticLine({ text, delay = 0 }: { text: string; delay?: number }) {
+  const locale = useLocale();
+  const isRtl = locale === 'ar';
+
+  if (isRtl) {
+    return (
+      <motion.span
+        className="inline-block"
+        initial={{ opacity: 0, y: '0.4em' }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay, duration: 0.75, ease: [0.22, 1, 0.36, 1] }}
+      >
+        {text}
+      </motion.span>
+    );
+  }
+
+  const chars = Array.from(text);
+  return (
+    <span className="inline-block">
+      {chars.map((c, i) => (
+        <motion.span
+          key={i}
+          className="inline-block"
+          initial={{ opacity: 0, y: '0.6em', rotateX: -80 }}
+          animate={{ opacity: 1, y: 0, rotateX: 0 }}
+          transition={{ delay: delay + i * 0.04, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+        >
+          {c === ' ' ? ' ' : c}
+        </motion.span>
+      ))}
+    </span>
+  );
+}
+
+/** Magnetic hover wrapper */
+function Magnetic({ children }: { children: ReactNode }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const mx = useMotionValue(0);
+  const my = useMotionValue(0);
+  const x = useSpring(mx, { stiffness: 200, damping: 15 });
+  const y = useSpring(my, { stiffness: 200, damping: 15 });
+
+  const onMove = (e: ReactPointerEvent) => {
+    const el = ref.current;
+    if (!el) return;
+    const r = el.getBoundingClientRect();
+    mx.set((e.clientX - (r.left + r.width / 2)) * 0.3);
+    my.set((e.clientY - (r.top + r.height / 2)) * 0.3);
+  };
+  const reset = () => {
+    mx.set(0);
+    my.set(0);
+  };
+
+  return (
+    <motion.div
+      ref={ref}
+      onPointerMove={onMove}
+      onPointerLeave={reset}
+      style={{ x, y }}
+      className="inline-block"
+    >
+      {children}
+    </motion.div>
+  );
+}
+
+/** Count up when in view */
+function Counter({ to }: { to: number }) {
+  const ref = useRef<HTMLSpanElement>(null);
+  const inView = useInView(ref, { once: true, amount: 0.6 });
+  const [val, setVal] = useState(0);
+
+  useEffect(() => {
+    if (!inView) return;
+    const controls = animate(0, to, {
+      duration: 1.4,
+      ease: [0.22, 1, 0.36, 1],
+      onUpdate: (v) => setVal(Math.round(v)),
+    });
+    return () => controls.stop();
+  }, [inView, to]);
+
+  return <span ref={ref}>{val}</span>;
 }
