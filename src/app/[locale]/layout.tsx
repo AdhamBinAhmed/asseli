@@ -9,6 +9,7 @@ import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
 import { GlobalSettingsProvider } from '@/components/layout/GlobalSettingsProvider';
 import { CartPopup } from '@/components/ui/CartPopup';
+import { Preloader } from '@/components/layout/Preloader';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -45,6 +46,7 @@ export default async function RootLayout({
     <html lang={locale} dir={locale === 'ar' ? 'rtl' : 'ltr'}>
       <body className="flex flex-col min-h-screen bg-background bg-[url('/phone-back.jpg')] md:bg-[url('/pc-back.jpg')] bg-cover bg-center bg-fixed text-foreground antialiased selection:bg-primary/20 selection:text-primary transition-colors duration-1000 ease-in-out">
         <NextIntlClientProvider messages={messages}>
+          <Preloader />
           <GlobalSettingsProvider>
             <div className="flex flex-col min-h-screen">
               <Navbar />
