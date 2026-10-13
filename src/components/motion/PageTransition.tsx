@@ -8,7 +8,8 @@ interface PageTransitionProps {
   children: ReactNode;
 }
 
-const EASE = [0.83, 0, 0.17, 1] as const;
+// Gentle, buttery ease-out — no overshoot, settles softly.
+const EASE = [0.25, 0.1, 0.25, 1] as const;
 
 export function PageTransition({ children }: PageTransitionProps) {
   const pathname = usePathname();
@@ -17,21 +18,15 @@ export function PageTransition({ children }: PageTransitionProps) {
     <motion.div
       key={pathname}
       className="flex-grow flex flex-col"
-      initial={{
-        clipPath: 'circle(0% at 50% 42%)',
-        opacity: 0.4,
-        scale: 1.06,
-      }}
-      animate={{
-        clipPath: 'circle(150% at 50% 42%)',
-        opacity: 1,
-        scale: 1,
-      }}
+      // transform + opacity only → fully GPU-composited, no layout/paint jank
+      initial={{ opacity: 0, y: 16, scale: 0.992 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
       transition={{
-        clipPath: { duration: 0.85, ease: EASE },
-        opacity: { duration: 0.5, ease: 'easeOut' },
-        scale: { duration: 0.9, ease: EASE },
+        opacity: { duration: 0.45, ease: 'easeOut' },
+        y: { duration: 0.65, ease: EASE },
+        scale: { duration: 0.65, ease: EASE },
       }}
+      style={{ willChange: 'transform, opacity' }}
     >
       {children}
     </motion.div>
