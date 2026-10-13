@@ -48,6 +48,26 @@ const governorates = [
   { value: 'south_sinai', en: 'South Sinai', ar: 'جنوب سيناء', cost: 120 },
 ];
 
+function Shell({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="relative min-h-[calc(100vh-4rem)] w-full overflow-clip bg-[#0b0705] text-amber-50">
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0"
+        style={{
+          background:
+            'radial-gradient(45% 35% at 15% 0%, rgba(245,158,11,0.16) 0%, transparent 60%), radial-gradient(45% 40% at 92% 12%, rgba(124,45,18,0.26) 0%, transparent 60%)',
+        }}
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(120%_70%_at_50%_0%,transparent_55%,#0b0705_100%)]"
+      />
+      <div className="relative">{children}</div>
+    </div>
+  );
+}
+
 export default function CartPage() {
   const t = useTranslations('CartPage');
   const locale = useLocale();
@@ -116,24 +136,6 @@ export default function CartPage() {
 
   const inputClass =
     'border-white/15 bg-white/[0.04] text-amber-50 placeholder:text-amber-100/40 focus-visible:ring-amber-400/40 focus-visible:border-amber-300/50';
-
-  const Shell = ({ children }: { children: React.ReactNode }) => (
-    <div className="relative min-h-[calc(100vh-4rem)] w-full overflow-clip bg-[#0b0705] text-amber-50">
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0"
-        style={{
-          background:
-            'radial-gradient(45% 35% at 15% 0%, rgba(245,158,11,0.16) 0%, transparent 60%), radial-gradient(45% 40% at 92% 12%, rgba(124,45,18,0.26) 0%, transparent 60%)',
-        }}
-      />
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(120%_70%_at_50%_0%,transparent_55%,#0b0705_100%)]"
-      />
-      <div className="relative">{children}</div>
-    </div>
-  );
 
   if (items.length === 0) {
     return (
