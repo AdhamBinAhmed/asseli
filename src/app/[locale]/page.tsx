@@ -24,8 +24,8 @@ import { ArrowRight, Check, Droplets, Leaf, Truck, ShieldCheck } from 'lucide-re
 type Flavor = 'classic' | 'dark';
 
 const FLAVORS: Record<Flavor, { img: string; glow: string; accent: string }> = {
-  classic: { img: '/honey-light.png', glow: '#f59e0b', accent: '#fbbf24' },
-  dark: { img: '/honey-dark.png', glow: '#b45309', accent: '#d97706' },
+  classic: { img: '/honey-light.webp', glow: '#f59e0b', accent: '#fbbf24' },
+  dark: { img: '/honey-dark.webp', glow: '#b45309', accent: '#d97706' },
 };
 
 /* =================================================================== */
@@ -287,6 +287,7 @@ function Hero({
                   key={flavor}
                   src={active.img}
                   alt={flavor === 'classic' ? t('classicAmber') : t('darkForest')}
+                  decoding="async"
                   style={{ rotateX: tiltX, rotateY: tiltY, transformStyle: 'preserve-3d' }}
                   initial={{ opacity: 0, scale: 0.8, filter: 'blur(12px)' }}
                   animate={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
@@ -409,6 +410,8 @@ function Featured({ t }: { t: ReturnType<typeof useTranslations> }) {
               <img
                 src={FLAVORS[f.key].img}
                 alt={f.title}
+                loading="lazy"
+                decoding="async"
                 className="relative h-64 w-auto object-contain drop-shadow-[0_25px_45px_rgba(0,0,0,0.55)] transition-transform duration-700 group-hover:-translate-y-2 group-hover:scale-105"
                 draggable={false}
               />
