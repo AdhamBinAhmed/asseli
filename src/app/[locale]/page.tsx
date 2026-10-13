@@ -59,7 +59,7 @@ export default function Home() {
 
 function Backdrop({ glow }: { glow: string }) {
   return (
-    <div aria-hidden className="pointer-events-none fixed inset-0 -z-10 overflow-hidden bg-[#0b0705]">
+    <div aria-hidden className="ass-fixed-bg pointer-events-none fixed inset-0 -z-10 overflow-hidden bg-[#0b0705]">
       {/* Drifting light mesh */}
       <div
         className="ass-mesh absolute inset-[-20%]"
@@ -71,8 +71,10 @@ function Backdrop({ glow }: { glow: string }) {
           transition: 'background 1.2s ease',
         }}
       />
-      {/* Soft ambient honey glows (blurred, no hard edges) */}
-      <svg className="absolute inset-0 h-full w-full opacity-40" preserveAspectRatio="xMidYMid slice">
+      {/* Soft ambient honey glows (blurred, no hard edges).
+          Hidden on mobile: a full-screen feGaussianBlur(55) is very costly to
+          composite while scrolling on phones. */}
+      <svg className="absolute inset-0 hidden h-full w-full opacity-40 sm:block" preserveAspectRatio="xMidYMid slice">
         <defs>
           <filter id="soften" x="-50%" y="-50%" width="200%" height="200%">
             <feGaussianBlur in="SourceGraphic" stdDeviation="55" />
@@ -565,7 +567,7 @@ function CtaBanner({ t }: { t: ReturnType<typeof useTranslations> }) {
 
 function Section({ children, className = '' }: { children: ReactNode; className?: string }) {
   return (
-    <section className={`relative py-24 md:py-32 ${className}`}>
+    <section className={`ass-section relative py-24 md:py-32 ${className}`}>
       <div className="mx-auto max-w-screen-xl px-6 md:px-12">{children}</div>
     </section>
   );

@@ -217,3 +217,37 @@
     animation: none !important;
   }
 }
+
+/* ===================== Scroll performance ===================== */
+
+/* The fixed, full-page animated backdrop is the single biggest source of
+   scroll jank: keep it on its own compositor layer so scrolling the page
+   content never forces it to repaint. */
+.ass-fixed-bg {
+  transform: translateZ(0);
+  will-change: transform;
+  backface-visibility: hidden;
+}
+
+/* `backdrop-filter` (backdrop-blur-*) forces the browser to re-sample
+   everything behind the element on every frame — cheap on desktop GPUs but
+   a severe scroll-jank source on phones. On coarse/touch pointers we drop
+   the live blur and fall back to a slightly more opaque background so the
+   frosted panels stay legible without the per-frame cost. */
+@media (hover: none), (pointer: coarse) {
+  [class*="backdrop-blur"] {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+  /* Soften the full-screen gaussian-blur SVG + drifting mesh on mobile;
+     these composite a huge surface area for little visual payoff on a small
+     screen. */
+  .ass-mesh { animation: none !important; }
+  .ass-drip { display: none !important; }
+}
+
+/* Let the browser skip layout/paint for long sections that are off-screen. */
+.ass-section {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 600px;
+}

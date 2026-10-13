@@ -112,17 +112,24 @@ export default function CartPage() {
 
       const docRef = await addDoc(collection(db, 'orders'), order);
 
-      // Send confirmation email (non-blocking: order already saved)
-      sendOrderEmail({
-        orderId: docRef.id,
-        customerName,
-        customerEmail,
-        customerPhone,
-        customerAddress,
-        governorate: selectedGovData?.en || selectedGov,
-        items: orderItems.map((i) => ({ name: i.name, quantity: i.quantity, price: i.price })),
-        total,
-      }).catch((err) => console.error('Email send failed:', err));
+      // Send confirmation email. Must be awaited BEFORE navigating — otherwise
+      // the client navigation aborts the server-action request mid-send.
+      // Order is already saved, so an email failure must not block the redirect.
+      try {
+        const res = await sendOrderEmail({
+          orderId: docRef.id,
+          customerName,
+          customerEmail,
+          customerPhone,
+          customerAddress,
+          governorate: selectedGovData?.en || selectedGov,
+          items: orderItems.map((i) => ({ name: i.name, quantity: i.quantity, price: i.price })),
+          total,
+        });
+        if (!res.success) console.error('Email send failed:', res.error);
+      } catch (err) {
+        console.error('Email send error:', err);
+      }
 
       clearCart();
       router.push(`/success?orderId=${docRef.id}`);

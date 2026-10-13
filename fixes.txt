@@ -1,0 +1,102 @@
+ASSELI — SECURITY & SCROLL-PERFORMANCE FIXES
+Date: 2026-10-13
+
+====================================================================
+SECURITY
+====================================================================
+
+[S1] Hardcoded admin passwords in source  (CRITICAL)
+  File: src/app/actions/auth.ts
+  Before: the super-admin and order-admin passwords were written as string
+          literals ('megadevs-admin-full', 'asseli-admin--8811') and committed
+          to git history — anyone with repo access had full admin access.
+  Fixed: passwords now read from env vars ADMIN_SUPER_PASSWORD /
+          ADMIN_ORDER_PASSWORD. If they are unset, those built-in logins simply
+          do not match.
+  ACTION REQUIRED: set these env vars, and rotate both passwords since the old
+          values are permanently in git history.
+
+[S2] Forgeable admin session cookie  (HIGH)
+  File: src/app/actions/auth.ts
+  Before: admin_token was plain JSON ({role,username}) with no signature.
+          Anyone who could set that cookie could mint themselves super_admin,
+          and getAdminRole() fell back to trusting the raw cookie string.
+  Fixed: the cookie is now HMAC-SHA256 signed (payload.signature) and verified
+          with a constant-time compare on every read; tampered or unsigned
+          tokens resolve to null. Added sameSite='lax'.
+  ACTION REQUIRED: set ADMIN_AUTH_SECRET to a long random value. Login is
+          disabled server-side until it is set, so a forgeable token can never
+          be issued. Existing old-format cookies are now rejected (admins
+          re-login once).
+
+[S3] Unauthenticated Cloudinary upload endpoint  (HIGH)
+  File: src/app/actions/upload.ts
+  Before: the uploadImage server action had no auth check — any visitor could
+          POST arbitrary files into the Cloudinary account (cost/abuse), with
+          no type or size limit.
+  Fixed: requires a valid admin session (getAdminRole); rejects non-image MIME
+          types (jpeg/png/webp/gif/avif only) and files larger than 8 MB.
+
+[S4] Open order-confirmation mail endpoint  (MEDIUM)
+  File: src/app/actions/email.ts
+  Before: sendOrderEmail could be called by anyone with any payload, usable as
+          a spam/relay amplifier from the shop's Gmail account.
+  Fixed: validates the recipient email format and length, and bounds the item
+          array (1..100). escapeHtml() was already in place for the body.
+  NOTE: consider adding rate-limiting / a real order check before send for
+          stronger protection.
+
+[S5] Customer PII lookup by phone number  (MEDIUM — not code-changed)
+  File: src/app/[locale]/track-order/page.tsx
+  Issue: order lookup falls back to querying by customerPhone, returning the
+          customer name + full address to anyone who guesses/knows a phone
+          number. Combined with client-side Firestore reads, exposure depends
+          entirely on Firestore security rules.
+  ACTION REQUIRED (infra, not code): lock down Firestore rules so the 'orders'
+          and 'admins' collections are not world-readable. The 'admins'
+          collection stores plaintext passwords (src/app/[locale]/admin/users)
+          — if rules are permissive, every admin password is public. Restrict
+          reads to authenticated admins and stop storing plaintext passwords
+          (hash them, or move admin accounts server-side).
+
+[S-note] NEXT_PUBLIC_FIREBASE_* keys (src/lib/firebase/config.ts) are expected
+          to be public for the Firebase web SDK — that is normal and NOT a leak.
+          Security for these comes from Firestore rules (see S5), not secrecy.
+
+====================================================================
+UI / UX — SCROLL PERFORMANCE (phone & laptop)
+====================================================================
+
+[P1] backdrop-blur on scrolling panels was the main jank source  (HIGH)
+  Files: src/app/globals.css (+ applied app-wide via attribute selector)
+  Issue: dozens of elements use backdrop-blur-md/xl/sm (nav, cards, cart,
+          certificate viewer, track-order, success, product cards, dropdowns).
+          backdrop-filter re-samples everything behind the element every frame
+          while scrolling — fine on desktop GPUs, severe stutter on phones.
+  Fixed: on coarse/touch pointers (@media hover:none / pointer:coarse) live
+          backdrop-filter is disabled; frosted panels still read via their
+          existing semi-opaque backgrounds + borders.
+
+[P2] Fixed full-page animated backdrop repainting on every scroll  (HIGH)
+  Files: src/app/[locale]/page.tsx (Backdrop), src/app/globals.css (.ass-fixed-bg)
+  Issue: the homepage's fixed inset-0 backdrop (drifting mesh + animated goo
+          blobs + vignette) was repainting as page content scrolled over it.
+  Fixed: promoted it to its own compositor layer (transform:translateZ(0),
+          will-change:transform, backface-visibility:hidden) so page scroll no
+          longer forces it to repaint.
+
+[P3] Full-screen SVG feGaussianBlur(stdDeviation 55) on mobile  (HIGH)
+  File: src/app/[locale]/page.tsx (Backdrop <svg>)
+  Issue: a viewport-sized Gaussian-blur filter is one of the most expensive
+          things to composite, and it added little on a small screen.
+  Fixed: SVG blur layer is now hidden below the sm breakpoint; the drifting
+          mesh animation and falling honey "drips" are also stopped on
+          touch/coarse devices (globals.css).
+
+[P4] Off-screen sections still fully laid out & painted  (MEDIUM)
+  Files: src/app/[locale]/page.tsx (Section), src/app/globals.css (.ass-section)
+  Fixed: homepage sections use content-visibility:auto with
+          contain-intrinsic-size so the browser can skip rendering work for
+          sections not near the viewport, cutting scroll cost on long pages.
+
+Verification: `npx tsc --noEmit` passes with all changes.

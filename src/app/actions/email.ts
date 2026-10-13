@@ -132,11 +132,23 @@ export async function sendOrderEmail(
       return { success: false, error: 'No customer email provided' };
     }
 
+    // Basic validation to keep this public endpoint from being abused as an
+    // open relay / spam amplifier.
+    const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(order.customerEmail);
+    if (!emailOk || order.customerEmail.length > 254) {
+      return { success: false, error: 'Invalid email address' };
+    }
+    if (!Array.isArray(order.items) || order.items.length === 0 || order.items.length > 100) {
+      return { success: false, error: 'Invalid order items' };
+    }
+
     const transporter = createTransport();
 
     await transporter.sendMail({
       from: `"Artisan Honey" <${GMAIL_USER}>`,
       to: order.customerEmail,
+      // Shop gets a copy of every order (defaults to the sending account).
+      bcc: process.env.ORDER_NOTIFY_EMAIL || GMAIL_USER,
       subject: `Your Artisan Honey Order #${order.orderId}`,
       html: buildHtml(order),
     });
