@@ -100,7 +100,8 @@
     "deliveryDetails": "Delivery Details",
     "fullName": "Full Name",
     "phone": "Phone Number",
-    "address": "Detailed Address"
+    "address": "Detailed Address",
+    "email": "Email Address"
   },
   "TrackOrder": {
     "title": "Track Your Order",

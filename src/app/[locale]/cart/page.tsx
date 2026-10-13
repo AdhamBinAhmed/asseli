@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Minus, Plus, Trash2, ShoppingBag, ArrowRight, Loader2 } from 'lucide-react';
 import { collection, addDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase/config';
+import { sendOrderEmail } from '@/app/actions/email';
 import {
   Select,
   SelectContent,
@@ -55,6 +56,7 @@ export default function CartPage() {
   const [selectedGov, setSelectedGov] = useState<string>('');
 
   const [customerName, setCustomerName] = useState('');
+  const [customerEmail, setCustomerEmail] = useState('');
   const [customerPhone, setCustomerPhone] = useState('');
   const [customerAddress, setCustomerAddress] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -68,23 +70,40 @@ export default function CartPage() {
   const shippingCost = selectedGovData ? selectedGovData.cost : 0;
   const total = subtotal + shippingCost;
 
+  const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customerEmail);
+
   const handleCheckout = async () => {
-    if (!selectedGov || !customerName || !customerPhone || !customerAddress) return;
+    if (!selectedGov || !customerName || !customerPhone || !customerAddress || !emailValid) return;
     setIsSubmitting(true);
 
     try {
+      const orderItems = items.map((i) => ({ name: i.name, quantity: i.quantity, price: i.price, id: i.id }));
       const order = {
         customerName,
+        customerEmail,
         customerPhone,
         customerAddress,
         governorate: selectedGovData?.en || selectedGov,
-        items: items.map((i) => ({ name: i.name, quantity: i.quantity, price: i.price, id: i.id })),
+        items: orderItems,
         total: total,
         status: 'pending',
         date: new Date().toISOString(),
       };
 
       const docRef = await addDoc(collection(db, 'orders'), order);
+
+      // Send confirmation email (non-blocking: order already saved)
+      sendOrderEmail({
+        orderId: docRef.id,
+        customerName,
+        customerEmail,
+        customerPhone,
+        customerAddress,
+        governorate: selectedGovData?.en || selectedGov,
+        items: orderItems.map((i) => ({ name: i.name, quantity: i.quantity, price: i.price })),
+        total,
+      }).catch((err) => console.error('Email send failed:', err));
+
       clearCart();
       router.push(`/success?orderId=${docRef.id}`);
     } catch (e) {
@@ -143,7 +162,7 @@ export default function CartPage() {
     );
   }
 
-  const isFormValid = selectedGov && customerName && customerPhone && customerAddress;
+  const isFormValid = selectedGov && customerName && emailValid && customerPhone && customerAddress;
 
   return (
     <Shell>
@@ -239,6 +258,7 @@ export default function CartPage() {
                   {t('deliveryDetails')}
                 </span>
                 <Input className={inputClass} placeholder={t('fullName')} value={customerName} onChange={(e) => setCustomerName(e.target.value)} />
+                <Input type="email" className={inputClass} placeholder={t('email')} value={customerEmail} onChange={(e) => setCustomerEmail(e.target.value)} />
                 <Input className={inputClass} placeholder={t('phone')} value={customerPhone} onChange={(e) => setCustomerPhone(e.target.value)} />
                 <Input className={inputClass} placeholder={t('address')} value={customerAddress} onChange={(e) => setCustomerAddress(e.target.value)} />
 
