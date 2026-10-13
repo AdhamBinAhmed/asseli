@@ -100,6 +100,7 @@
     "deliveryDetails": "Delivery Details",
     "fullName": "Full Name",
     "phone": "Phone Number",
+    "phoneError": "Phone must start with 01 and be 11 digits.",
     "address": "Detailed Address",
     "email": "Email Address"
   },

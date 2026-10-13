@@ -7,7 +7,7 @@ import { Link, useRouter } from '@/i18n/routing';
 import { ScrollFadeIn } from '@/components/motion/ScrollFadeIn';
 import { Input } from '@/components/ui/input';
 import { Minus, Plus, Trash2, ShoppingBag, ArrowRight, Loader2 } from 'lucide-react';
-import { collection, addDoc } from 'firebase/firestore';
+import { collection, addDoc, deleteDoc, doc } from 'firebase/firestore';
 import { db } from '@/lib/firebase/config';
 import { sendOrderEmail } from '@/app/actions/email';
 import {
@@ -91,9 +91,11 @@ export default function CartPage() {
   const total = subtotal + shippingCost;
 
   const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customerEmail);
+  // Egyptian mobile: exactly 11 digits starting with "01".
+  const phoneValid = /^01\d{9}$/.test(customerPhone);
 
   const handleCheckout = async () => {
-    if (!selectedGov || !customerName || !customerPhone || !customerAddress || !emailValid) return;
+    if (!selectedGov || !customerName || !phoneValid || !customerAddress || !emailValid) return;
     setIsSubmitting(true);
 
     try {
@@ -112,11 +114,12 @@ export default function CartPage() {
 
       const docRef = await addDoc(collection(db, 'orders'), order);
 
-      // Send confirmation email. Must be awaited BEFORE navigating — otherwise
-      // the client navigation aborts the server-action request mid-send.
-      // Order is already saved, so an email failure must not block the redirect.
+      // Send confirmation email + enforce the per-email / per-phone order limit.
+      // Must be awaited BEFORE navigating — otherwise the client navigation
+      // aborts the server-action request mid-send.
+      let res: Awaited<ReturnType<typeof sendOrderEmail>> | null = null;
       try {
-        const res = await sendOrderEmail({
+        res = await sendOrderEmail({
           orderId: docRef.id,
           customerName,
           customerEmail,
@@ -126,10 +129,21 @@ export default function CartPage() {
           items: orderItems.map((i) => ({ name: i.name, quantity: i.quantity, price: i.price })),
           total,
         });
-        if (!res.success) console.error('Email send failed:', res.error);
       } catch (err) {
         console.error('Email send error:', err);
       }
+
+      // A hard rejection (rate limit / invalid phone/email) must block the
+      // order: roll back the just-created doc and show why. A transient SMTP
+      // failure (res.success false without `blocked`) still lets the order go
+      // through since it is already saved.
+      if (res && !res.success && res.blocked) {
+        await deleteDoc(doc(db, 'orders', docRef.id)).catch(() => {});
+        alert(res.error || 'Order could not be placed.');
+        setIsSubmitting(false);
+        return;
+      }
+      if (res && !res.success) console.error('Email send failed:', res.error);
 
       clearCart();
       router.push(`/success?orderId=${docRef.id}`);
@@ -171,7 +185,7 @@ export default function CartPage() {
     );
   }
 
-  const isFormValid = selectedGov && customerName && emailValid && customerPhone && customerAddress;
+  const isFormValid = selectedGov && customerName && emailValid && phoneValid && customerAddress;
 
   return (
     <Shell>
@@ -268,7 +282,18 @@ export default function CartPage() {
                 </span>
                 <Input className={inputClass} placeholder={t('fullName')} value={customerName} onChange={(e) => setCustomerName(e.target.value)} />
                 <Input type="email" className={inputClass} placeholder={t('email')} value={customerEmail} onChange={(e) => setCustomerEmail(e.target.value)} />
-                <Input className={inputClass} placeholder={t('phone')} value={customerPhone} onChange={(e) => setCustomerPhone(e.target.value)} />
+                <Input
+                  type="tel"
+                  inputMode="numeric"
+                  maxLength={11}
+                  className={inputClass}
+                  placeholder={t('phone')}
+                  value={customerPhone}
+                  onChange={(e) => setCustomerPhone(e.target.value.replace(/\D/g, '').slice(0, 11))}
+                />
+                {customerPhone.length > 0 && !phoneValid && (
+                  <span className="-mt-1 text-xs text-red-300">{t('phoneError')}</span>
+                )}
                 <Input className={inputClass} placeholder={t('address')} value={customerAddress} onChange={(e) => setCustomerAddress(e.target.value)} />
 
                 <Select onValueChange={(val: string | null) => setSelectedGov(val || '')}>

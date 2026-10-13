@@ -46,6 +46,41 @@ SECURITY
   NOTE: consider adding rate-limiting / a real order check before send for
           stronger protection.
 
+[S6] Order rate limit — 3 orders per email AND per phone per 24h  (MEDIUM)
+  Files: src/app/actions/email.ts, src/app/[locale]/cart/page.tsx
+  Added: before an order is finalized, both the email inbox and the phone
+          number are checked against a Firestore-backed counter
+          ('order_rate_limits' collection). A maximum of 3 orders per 24 hours
+          is enforced for each; a 4th attempt is rejected with a message that
+          names which limit was hit.
+  Details:
+    - Gmail/Googlemail addresses are normalized (dots removed, "+suffix"
+      stripped, lowercased) so john.doe+a@gmail.com and johndoe@gmail.com
+      count as the same inbox and the limit can't be bypassed. Phone is reduced
+      to digits before counting.
+    - Equality-only Firestore queries (no composite index required); the 24h
+      window is filtered in memory.
+    - The limit truly blocks the order: on a hard rejection the just-created
+      'orders' doc is rolled back (deleted) and the error is shown to the user,
+      instead of only failing the email. Transient SMTP errors still let the
+      already-saved order through.
+    - Fails open: if the Firestore read errors, the order is allowed through
+      so a transient DB problem never blocks a real customer.
+  ACTION REQUIRED (infra): add a Firestore rule allowing create/read on
+          'order_rate_limits', and optionally a scheduled cleanup to delete
+          docs older than 24h.
+
+[S7] Phone number format validation  (LOW)
+  Files: src/app/[locale]/cart/page.tsx, src/app/actions/email.ts,
+         messages/en.json, messages/ar.json
+  Added: the checkout phone field must be an Egyptian mobile — exactly 11
+          digits starting with "01" (regex /^01\d{9}$/).
+    - Client: input is type=tel/inputMode=numeric, strips non-digits, caps at
+      11 chars, shows an inline error (new "phoneError" i18n key, EN + AR), and
+      the Place Order button stays disabled until valid.
+    - Server: sendOrderEmail re-validates the same rule (never trust the
+      client) and rejects with `blocked: true` if it fails.
+
 [S5] Customer PII lookup by phone number  (MEDIUM — not code-changed)
   File: src/app/[locale]/track-order/page.tsx
   Issue: order lookup falls back to querying by customerPhone, returning the

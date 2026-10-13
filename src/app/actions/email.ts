@@ -1,6 +1,71 @@
 'use server';
 
 import nodemailer from 'nodemailer';
+import { db } from '@/lib/firebase/config';
+import { collection, query, where, getDocs, addDoc } from 'firebase/firestore';
+
+const ORDER_LIMIT = 3;
+const WINDOW_MS = 24 * 60 * 60 * 1000; // 24 hours
+
+/**
+ * Normalize an email to a single logical inbox so the rate limit can't be
+ * trivially bypassed. For Gmail/Googlemail, dots in the local part are ignored
+ * and anything after a "+" is a sub-address of the same inbox.
+ */
+function normalizeEmail(email: string): string {
+  const lower = email.trim().toLowerCase();
+  const at = lower.lastIndexOf('@');
+  if (at < 0) return lower;
+  let local = lower.slice(0, at);
+  const domain = lower.slice(at + 1);
+  if (domain === 'gmail.com' || domain === 'googlemail.com') {
+    local = local.split('+')[0].replace(/\./g, '');
+    return `${local}@gmail.com`;
+  }
+  return `${local}@${domain}`;
+}
+
+/** Count orders placed in the trailing window for a given key field/value. */
+async function countRecent(field: 'email' | 'phone', value: string): Promise<number> {
+  const cutoff = Date.now() - WINDOW_MS;
+  // Equality-only query (no composite index needed); window-filter in memory.
+  const snap = await getDocs(
+    query(collection(db, 'order_rate_limits'), where(field, '==', value))
+  );
+  return snap.docs.filter((d) => (d.data().createdAt ?? 0) >= cutoff).length;
+}
+
+/**
+ * Enforces ORDER_LIMIT orders per 24h for BOTH the email inbox and the phone
+ * number. If either is already at the limit the order is rejected. Records the
+ * attempt (keyed by both) when allowed. Backed by Firestore so the limit holds
+ * across server instances. Fails open on read error so a transient DB issue
+ * never blocks a legitimate order.
+ */
+async function checkAndRecordRateLimit(
+  email: string,
+  phone: string
+): Promise<{ allowed: boolean; reason?: 'email' | 'phone' }> {
+  const emailKey = normalizeEmail(email);
+  const phoneKey = phone.replace(/\D/g, '');
+  try {
+    if ((await countRecent('email', emailKey)) >= ORDER_LIMIT) {
+      return { allowed: false, reason: 'email' };
+    }
+    if ((await countRecent('phone', phoneKey)) >= ORDER_LIMIT) {
+      return { allowed: false, reason: 'phone' };
+    }
+    await addDoc(collection(db, 'order_rate_limits'), {
+      email: emailKey,
+      phone: phoneKey,
+      createdAt: Date.now(),
+    });
+    return { allowed: true };
+  } catch (e) {
+    console.error('Rate-limit check failed, allowing send:', e);
+    return { allowed: true };
+  }
+}
 
 export interface OrderEmailItem {
   name: string;
@@ -126,20 +191,38 @@ function escapeHtml(str: string): string {
 
 export async function sendOrderEmail(
   order: OrderEmailPayload
-): Promise<{ success: boolean; error?: string }> {
+): Promise<{ success: boolean; error?: string; blocked?: boolean }> {
   try {
     if (!order.customerEmail) {
-      return { success: false, error: 'No customer email provided' };
+      return { success: false, blocked: true, error: 'No customer email provided' };
     }
 
     // Basic validation to keep this public endpoint from being abused as an
     // open relay / spam amplifier.
     const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(order.customerEmail);
     if (!emailOk || order.customerEmail.length > 254) {
-      return { success: false, error: 'Invalid email address' };
+      return { success: false, blocked: true, error: 'Invalid email address' };
     }
     if (!Array.isArray(order.items) || order.items.length === 0 || order.items.length > 100) {
-      return { success: false, error: 'Invalid order items' };
+      return { success: false, blocked: true, error: 'Invalid order items' };
+    }
+
+    // Egyptian mobile: exactly 11 digits starting with "01".
+    if (!/^01\d{9}$/.test((order.customerPhone || '').replace(/\D/g, ''))) {
+      return { success: false, blocked: true, error: 'Phone must start with 01 and be 11 digits.' };
+    }
+
+    // Allow at most 3 orders per 24 hours per email inbox AND per phone number.
+    const limit = await checkAndRecordRateLimit(order.customerEmail, order.customerPhone);
+    if (!limit.allowed) {
+      return {
+        success: false,
+        blocked: true,
+        error:
+          limit.reason === 'phone'
+            ? 'Order limit reached: a maximum of 3 orders per 24 hours is allowed for this phone number.'
+            : 'Order limit reached: a maximum of 3 orders per 24 hours is allowed for this email.',
+      };
     }
 
     const transporter = createTransport();
